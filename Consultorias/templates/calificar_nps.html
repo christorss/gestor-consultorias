@@ -1,0 +1,50 @@
+{% extends 'PlantillaGeneral.html' %}
+{% load static %}
+
+{% block title %}Calificar Sesiones - Mentor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">Calificar Sesiones</h2>
+</div>
+
+{% if sesiones %}
+  {% for sesion in sesiones %}
+    <div class="card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h5 class="fw-bold mb-1">{{ sesion.titulo }}</h5>
+          <small class="text-muted">{{ sesion.consultor.nombre }} — {{ sesion.fecha_inicio|date:"d/m/Y" }}</small>
+        </div>
+        {% if sesion.calificacion_nps %}
+          <span class="badge bg-success fs-6">Calificado: {{ sesion.calificacion_nps }}/10</span>
+        {% endif %}
+      </div>
+
+      {% if not sesion.calificacion_nps %}
+        <form method="POST" class="row g-2 align-items-end">
+          {% csrf_token %}
+          <input type="hidden" name="sesion_id" value="{{ sesion.id }}">
+          <div class="col-auto">
+            <label class="small text-muted">Calificación (1-10)</label>
+            <input type="number" name="calificacion_nps" min="1" max="10" class="form-control" required>
+          </div>
+          <div class="col">
+            <label class="small text-muted">Comentario (opcional)</label>
+            <input type="text" name="feedback_cliente" class="form-control" placeholder="Tu opinión...">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-success">Enviar</button>
+          </div>
+        </form>
+      {% else %}
+        {% if sesion.feedback_cliente %}
+          <p class="mb-0 small text-muted">Comentario: "{{ sesion.feedback_cliente }}"</p>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="text-muted">No hay sesiones completadas para calificar.</p>
+{% endif %}
+{% endblock %}

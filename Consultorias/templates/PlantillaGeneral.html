@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>{% block title %}Gestor de Consultorías y Mentores{% endblock %} - Mentor</title>
+  <meta name="description" content="Gestor de Consultorías de Negocios y Mentores">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+  <!-- Core Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- Custom Styles for Dashboard & Modules -->
+  <style>
+    .brand-accent { color: #5fcf80; }
+    .bg-brand-accent { background-color: #5fcf80; color: #fff; }
+    .btn-get-started {
+      background: #5fcf80;
+      color: #fff;
+      border-radius: 50px;
+      padding: 8px 25px;
+      white-space: nowrap;
+      transition: 0.3s;
+      font-size: 14px;
+      display: inline-block;
+    }
+    .btn-get-started:hover {
+      background: #3cb371;
+      color: #fff;
+    }
+    .card-custom {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .card-custom:hover {
+      transform: translateY(-2px);
+    }
+    .badge-status {
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .sortable-item {
+      cursor: grab;
+      background: #fff;
+      border-left: 5px solid #5fcf80;
+      margin-bottom: 12px;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .sortable-item:active {
+      cursor: grabbing;
+    }
+    .keyboard-badge {
+      background: #343a40;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="index-page">
+
+  <!-- Header Navigation -->
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'Consultorias:index' %}" class="logo d-flex align-items-center me-auto">
+        <h1 class="sitename"><i class="bi bi-briefcase me-2 brand-accent"></i>Mentor</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'Consultorias:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+            {% if user_role == 'cliente' %}
+              <li><a href="{% url 'Consultorias:calendario' %}" class="{% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">Mis Sesiones</a></li>
+              <li><a href="{% url 'Consultorias:plan_trabajo' %}" class="{% if request.resolver_match.url_name == 'plan_trabajo' %}active{% endif %}">Objetivos</a></li>
+              <li><a href="{% url 'Consultorias:avances_cliente' %}" class="{% if request.resolver_match.url_name == 'avances_cliente' %}active{% endif %}">Entregables</a></li>
+              <li><a href="{% url 'Consultorias:calificar_nps' %}" class="{% if request.resolver_match.url_name == 'calificar_nps' %}active{% endif %}">Calificar Sesiones</a></li>
+            {% else %}
+              <li><a href="{% url 'Consultorias:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard Hitos</a></li>
+              <li><a href="{% url 'Consultorias:calendario' %}" class="{% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">Calendario</a></li>
+              <li><a href="{% url 'Consultorias:plan_trabajo' %}" class="{% if request.resolver_match.url_name == 'plan_trabajo' %}active{% endif %}">Objetivos</a></li>
+              <li><a href="{% url 'Consultorias:notas_sesion' %}" class="{% if request.resolver_match.url_name == 'notas_sesion' %}active{% endif %}">Notas Sesión</a></li>
+              <li><a href="{% url 'Consultorias:reportes_nps' %}" class="{% if request.resolver_match.url_name == 'reportes_nps' %}active{% endif %}">NPS Consultores</a></li>
+
+              <li class="dropdown"><a href="#"><span>Entidades</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="{% url 'Consultorias:consultores_lista' %}">Consultores</a></li>
+                  <li><a href="{% url 'Consultorias:clientes_lista' %}">Clientes Mentoreados</a></li>
+                  <li><a href="{% url 'Consultorias:sesiones_lista' %}">Sesiones</a></li>
+                </ul>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      {% if user.is_authenticated %}
+        <div class="d-flex align-items-center ms-3">
+          <span class="text-muted me-3 small fw-bold"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+          <a class="btn-get-started bg-secondary border-0 text-white" href="{% url 'logout' %}">Salir</a>
+        </div>
+      {% else %}
+        <a class="btn-get-started" href="{% url 'login' %}">Iniciar Sesión</a>
+      {% endif %}
+
+    </div>
+  </header>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+  <main class="main my-4">
+    <div class="container-fluid container-xl">
+      {% if messages %}
+        <div class="my-3">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer position-relative light-background mt-5 py-4 border-top">
+    <div class="container text-center">
+      <h4 class="sitename mb-1 brand-accent">Mentor Consultorías</h4>
+      <p class="text-muted small mb-0">Gestor de Consultorías de Negocios y Mentores</p>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+  <!-- jQuery (requerido por DataTables) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- DataTables -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    // Global delete handler with SweetAlert
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('[data-delete-url]');
+      if (!btn) return;
+      e.preventDefault();
+      const url = btn.dataset.deleteUrl;
+      const name = btn.dataset.deleteName || 'este registro';
+      const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+      Swal.fire({
+        title: 'Confirmar eliminación',
+        text: `¿Está seguro de eliminar ${name}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then(result => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Eliminando...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+          });
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrf ? csrf.value : ''
+            }
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire('Eliminado', 'Registro eliminado correctamente.', 'success')
+                .then(() => location.reload());
+            } else {
+              Swal.fire('Error', data.error || 'No se pudo eliminar.', 'error');
+            }
+          })
+          .catch(() => {
+            Swal.fire('Error', 'Error de conexión.', 'error');
+          });
+        }
+      });
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

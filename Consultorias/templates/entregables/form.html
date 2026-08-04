@@ -1,0 +1,102 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}{% if entregable %}Revisar{% else %}Nuevo{% endif %} Entregable - Mentor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-7">
+    <div class="card p-4">
+      <h3 class="fw-bold mb-4">{% if entregable %}Revisar{% else %}Nuevo{% endif %} Entregable</h3>
+
+      <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% if errors %}
+          <div class="alert alert-danger py-2 mb-3">Corrija los errores antes de guardar.</div>
+        {% endif %}
+        {% if not entregable %}
+          <div class="mb-3">
+            <label for="cliente_id" class="form-label fw-semibold">Cliente Mentoreado</label>
+            <select name="cliente_id" id="cliente_id" class="form-select {% if errors.cliente_id %}is-invalid{% endif %}" required>
+              <option value="">Seleccione un cliente...</option>
+              {% for cli in clientes %}
+                <option value="{{ cli.id }}" {% if form_data.cliente_id|stringformat:"s" == cli.id|stringformat:"s" %}selected{% endif %}>{{ cli.nombre }} - {{ cli.empresa }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">{% if errors.cliente_id %}{{ errors.cliente_id }}{% else %}Seleccione un cliente mentoreado.{% endif %}</div>
+          </div>
+          <div class="mb-3">
+            <label for="objetivo_id" class="form-label fw-semibold">Hito / Objetivo Asociado</label>
+            <select name="objetivo_id" id="objetivo_id" class="form-select {% if errors.objetivo_id %}is-invalid{% endif %}" required>
+              <option value="">Seleccione un hito...</option>
+              {% for obj in objetivos %}
+                <option value="{{ obj.id }}" {% if form_data.objetivo_id|stringformat:"s" == obj.id|stringformat:"s" %}selected{% endif %}>{{ obj.cliente.empresa }} - {{ obj.titulo }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">{% if errors.objetivo_id %}{{ errors.objetivo_id }}{% else %}Seleccione un hito asociado.{% endif %}</div>
+          </div>
+          <div class="mb-3">
+            <label for="titulo" class="form-label fw-semibold">Título del Entregable</label>
+            <input type="text" name="titulo" id="titulo" class="form-control {% if errors.titulo %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.titulo }}{% endif %}" required>
+            <div class="invalid-feedback">{% if errors.titulo %}{{ errors.titulo }}{% else %}Por favor ingrese un título.{% endif %}</div>
+          </div>
+          <div class="mb-3">
+            <label for="enlace_externo" class="form-label fw-semibold">Enlace Externo</label>
+            <input type="url" name="enlace_externo" id="enlace_externo" class="form-control" value="{% if form_data %}{{ form_data.enlace_externo }}{% endif %}" placeholder="https://...">
+          </div>
+          <div class="mb-4">
+            <label for="archivo" class="form-label fw-semibold">Archivo Adjunto (solo PDF)</label>
+            <input type="file" name="archivo" id="archivo" class="form-control {% if errors.archivo %}is-invalid{% endif %}" accept=".pdf">
+            <div class="invalid-feedback">{% if errors.archivo %}{{ errors.archivo }}{% else %}Solo se permiten archivos PDF.{% endif %}</div>
+          </div>
+        {% else %}
+          <div class="bg-light p-3 mb-4">
+            <h5 class="fw-bold mb-1">{{ entregable.titulo }}</h5>
+            <p class="text-muted small mb-1"><strong>Cliente:</strong> {{ entregable.cliente.nombre }} ({{ entregable.cliente.empresa }})</p>
+            <p class="text-muted small mb-0"><strong>Hito:</strong> {{ entregable.objetivo.titulo }}</p>
+          </div>
+
+          <div class="mb-3">
+            <label for="estado" class="form-label fw-semibold">Estado de Validación del Consultor</label>
+            <select name="estado" id="estado" class="form-select">
+              <option value="PENDIENTE" {% if entregable.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+              <option value="EN_REVISION" {% if entregable.estado == 'EN_REVISION' %}selected{% endif %}>En Revisión</option>
+              <option value="APROBADO" {% if entregable.estado == 'APROBADO' %}selected{% endif %}>Aprobado</option>
+              <option value="RECHAZADO" {% if entregable.estado == 'RECHAZADO' %}selected{% endif %}>Rechazado</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="comentarios_consultor" class="form-label fw-semibold">Comentarios / Feedback</label>
+            <textarea name="comentarios_consultor" id="comentarios_consultor" class="form-control" rows="4">{{ entregable.comentarios_consultor|default:'' }}</textarea>
+          </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-end gap-2">
+          <a href="{% url 'Consultorias:avances_cliente' %}" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-success">{% if entregable %}Guardar Cambios{% else %}Enviar a Revisión{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

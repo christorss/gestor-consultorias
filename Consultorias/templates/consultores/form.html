@@ -1,0 +1,106 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}{% if consultor %}Editar{% else %}Nuevo{% endif %} Consultor - Mentor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-7">
+    <div class="card p-4">
+      <div class="card-body">
+        <h3 class="fw-bold mb-4">{% if consultor %}Editar{% else %}Nuevo{% endif %} Consultor</h3>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          {% if errors %}
+            <div class="alert alert-danger py-2 mb-3">Corrija los errores antes de guardar.</div>
+          {% endif %}
+          {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+          <div class="mb-3">
+            <label for="nombre" class="form-label fw-semibold">Nombre Completo</label>
+            <input type="text" name="nombre" id="nombre" class="form-control {% if errors.nombre %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.nombre }}{% else %}{{ consultor.nombre|default:'' }}{% endif %}" required>
+            <div class="invalid-feedback">{% if errors.nombre %}{{ errors.nombre }}{% else %}Por favor ingrese el nombre del consultor.{% endif %}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="especialidad" class="form-label fw-semibold">Especialidad</label>
+              <input type="text" name="especialidad" id="especialidad" class="form-control {% if errors.especialidad %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.especialidad }}{% else %}{{ consultor.especialidad|default:'' }}{% endif %}" placeholder="Ej. Finanzas, Estrategia" required>
+              <div class="invalid-feedback">{% if errors.especialidad %}{{ errors.especialidad }}{% else %}Por favor ingrese la especialidad.{% endif %}</div>
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+              <input type="email" name="email" id="email" class="form-control {% if errors.email %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.email }}{% else %}{{ consultor.email|default:'' }}{% endif %}" required>
+              <div class="invalid-feedback">{% if errors.email %}{{ errors.email }}{% else %}Por favor ingrese un correo electrónico.{% endif %}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="telefono" class="form-label fw-semibold">Teléfono</label>
+              <input type="text" name="telefono" id="telefono" class="form-control" value="{% if form_data %}{{ form_data.telefono }}{% else %}{{ consultor.telefono|default:'' }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+              <label for="tarifa_hora" class="form-label fw-semibold">Tarifa por Hora ($)</label>
+              <input type="number" step="0.01" name="tarifa_hora" id="tarifa_hora" class="form-control" value="{% if form_data %}{{ form_data.tarifa_hora }}{% else %}{{ consultor.tarifa_hora|default:'75.00' }}{% endif %}">
+            </div>
+          </div>
+          {% if consultor and not form_data %}
+            <div class="mb-3">
+              <label for="estado" class="form-label fw-semibold">Estado</label>
+              <select name="estado" id="estado" class="form-select">
+                <option value="ACTIVO" {% if consultor.estado == 'ACTIVO' %}selected{% endif %}>Activo</option>
+                <option value="INACTIVO" {% if consultor.estado == 'INACTIVO' %}selected{% endif %}>Inactivo</option>
+              </select>
+            </div>
+          {% endif %}
+          <div class="mb-4">
+            <label for="biografia" class="form-label fw-semibold">Biografía / Perfil Profesional</label>
+            <textarea name="biografia" id="biografia" class="form-control" rows="3">{% if form_data %}{{ form_data.biografia }}{% else %}{{ consultor.biografia|default:'' }}{% endif %}</textarea>
+          </div>
+
+          <hr class="my-4">
+          <h5 class="fw-bold mb-3">Usuario de acceso</h5>
+          {% if consultor and consultor.user %}
+            <div class="alert alert-info">Vinculado al usuario <strong>{{ consultor.user.username }}</strong></div>
+          {% else %}
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="username" class="form-label fw-semibold">Nombre de usuario</label>
+                <input type="text" name="username" id="username" class="form-control" value="{% if form_data %}{{ form_data.username }}{% endif %}" placeholder="Opcional">
+              </div>
+              <div class="col-md-6">
+                <label for="password" class="form-label fw-semibold">Contraseña</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Opcional">
+              </div>
+            </div>
+            <small class="text-muted">Deja ambos en blanco si no quieres crear acceso.</small>
+          {% endif %}
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="{% url 'Consultorias:consultores_lista' %}" class="btn btn-secondary px-4">Cancelar</a>
+            <button type="submit" class="btn btn-success px-4">Guardar Consultor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

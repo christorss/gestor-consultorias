@@ -1,0 +1,91 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}Entregables y Avances - Mentor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-check me-2 brand-accent"></i>Entregables y Avances Subidos</h2>
+    <p class="text-muted mb-0">Revisión y validación de evidencias de avance enviadas por los clientes</p>
+  </div>
+  <div>
+    <a href="{% url 'Consultorias:avances_cliente' %}" class="btn btn-outline-success rounded-pill px-4 me-2"><i class="bi bi-question-circle me-1"></i>Tour de Avances</a>
+    <a href="{% url 'Consultorias:entregable_crear' %}" class="btn btn-success rounded-pill px-4 shadow-sm"><i class="bi bi-cloud-upload me-1"></i>Nuevo Entregable</a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 p-4">
+  <div class="table-responsive">
+    <table id="table-entregables" class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Título del Entregable</th>
+          <th>Cliente / Empresa</th>
+          <th>Hito Asociado</th>
+          <th>Recurso / Enlace</th>
+          <th>Estado de Revisión</th>
+          <th>Fecha Entrega</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in entregables %}
+          <tr>
+            <td class="fw-bold text-dark">{{ e.titulo }}</td>
+            <td>{{ e.cliente.nombre }} ({{ e.cliente.empresa }})</td>
+            <td><span class="badge bg-light text-dark border">{{ e.objetivo.titulo }}</span></td>
+            <td>
+              {% if e.enlace_externo %}
+                <a href="{{ e.enlace_externo }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-link-45deg me-1"></i>Abrir Enlace</a>
+              {% endif %}
+              {% if e.archivo %}
+                <a href="{{ e.archivo.url }}" download class="btn btn-sm btn-outline-dark rounded-pill"><i class="bi bi-download me-1"></i>Archivo</a>
+              {% endif %}
+            </td>
+            <td>
+              {% if e.estado == 'APROBADO' %}
+                <span class="badge bg-success">Aprobado</span>
+              {% elif e.estado == 'EN_REVISION' %}
+                <span class="badge bg-warning text-dark">En Revisión</span>
+              {% elif e.estado == 'RECHAZADO' %}
+                <span class="badge bg-danger">Rechazado</span>
+              {% else %}
+                <span class="badge bg-secondary">Pendiente</span>
+              {% endif %}
+            </td>
+            <td class="small">{{ e.fecha_entrega|date:"d/m/Y H:i" }}</td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <a href="{% url 'Consultorias:entregable_editar' e.id %}" class="btn btn-sm btn-outline-secondary rounded-circle" title="Revisar / Comentar">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="#" data-delete-url="{% url 'Consultorias:entregable_eliminar' e.id %}" data-delete-name="el entregable {{ e.titulo }}" class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">No hay entregables registrados.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    $('#table-entregables').DataTable({
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+      },
+      pageLength: 10,
+      order: [[5, 'desc']]
+    });
+  });
+</script>
+{% endblock %}

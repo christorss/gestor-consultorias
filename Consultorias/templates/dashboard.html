@@ -1,0 +1,217 @@
+{% extends 'PlantillaGeneral.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Hitos de Negocio - Mentor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2 brand-accent"></i>Dashboard de Hitos de Negocio</h2>
+    <p class="text-muted mb-0">Seguimiento de cumplimiento de objetivos empresariales por cliente mentoreado</p>
+  </div>
+  <div>
+    <a href="{% url 'Consultorias:plan_trabajo' %}" class="btn btn-success rounded-pill px-4 me-2"><i class="bi bi-list-task me-1"></i>Gestionar Plan</a>
+    <a href="{% url 'Consultorias:reportes_nps' %}" class="btn btn-outline-dark rounded-pill px-3"><i class="bi bi-star-fill me-1 text-warning"></i>Reporte NPS</a>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-4 border-success">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-bold uppercase">Cumplimiento Global</span>
+          <h2 class="fw-bold text-success mb-0">{{ tasa_cumplimiento }}%</h2>
+        </div>
+        <div class="bg-success-subtle p-3 rounded-circle text-success">
+          <i class="bi bi-pie-chart-fill fs-3"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-4 border-primary">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-bold uppercase">Hitos Completados</span>
+          <h2 class="fw-bold text-primary mb-0">{{ objetivos_completados }}</h2>
+        </div>
+        <div class="bg-primary-subtle p-3 rounded-circle text-primary">
+          <i class="bi bi-check-circle-fill fs-3"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-4 border-warning">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-bold uppercase">En Proceso</span>
+          <h2 class="fw-bold text-warning mb-0">{{ objetivos_en_proceso }}</h2>
+        </div>
+        <div class="bg-warning-subtle p-3 rounded-circle text-warning">
+          <i class="bi bi-hourglass-split fs-3"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-4 border-secondary">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-bold uppercase">Pendientes</span>
+          <h2 class="fw-bold text-secondary mb-0">{{ objetivos_pendientes }}</h2>
+        </div>
+        <div class="bg-light p-3 rounded-circle text-secondary">
+          <i class="bi bi-list-stars fs-3"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line me-2 text-success"></i>Porcentaje de Cumplimiento de Hitos por Cliente</h5>
+      <div style="height: 300px; position: relative;">
+        <canvas id="chartCumplimiento"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2 text-primary"></i>Distribución de Hitos</h5>
+      <div style="height: 280px; position: relative;" class="d-flex align-items-center justify-content-center">
+        <canvas id="chartEstadoHitos"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Client Progress Table -->
+<div class="card border-0 shadow-sm rounded-4 p-4">
+  <h5 class="fw-bold mb-3"><i class="bi bi-buildings me-2 text-dark"></i>Detalle de Avance por Cliente Mentoreado</h5>
+  <div class="table-responsive">
+    <table id="table-dashboard-progreso" class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Cliente / Empresa</th>
+          <th>Consultor Asignado</th>
+          <th>Hitos Totales</th>
+          <th style="width: 25%;">Progreso de Cumplimiento</th>
+          <th>Desglose (Comp / Proc / Pend)</th>
+          <th class="text-end">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cp in clientes_progreso %}
+          <tr>
+            <td>
+              <div class="fw-bold text-dark">{{ cp.cliente.nombre }}</div>
+              <small class="text-muted"><i class="bi bi-briefcase me-1"></i>{{ cp.cliente.empresa }} ({{ cp.cliente.sector }})</small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark border">{{ cp.cliente.consultor.nombre }}</span>
+            </td>
+            <td class="fw-bold text-center">{{ cp.total_hitos }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="progress flex-grow-1 me-3" style="height: 12px; border-radius: 6px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ cp.porcentaje }}%;" aria-valuenow="{{ cp.porcentaje }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <span class="fw-bold small">{{ cp.porcentaje }}%</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-success me-1">{{ cp.completados }} completados</span>
+              <span class="badge bg-warning text-dark me-1">{{ cp.en_proceso }} proceso</span>
+              <span class="badge bg-secondary">{{ cp.pendientes }} pend.</span>
+            </td>
+            <td class="text-end">
+              <a href="{% url 'Consultorias:plan_trabajo' %}?cliente_id={{ cp.cliente.id }}" class="btn btn-sm btn-outline-success rounded-pill">
+                <i class="bi bi-arrow-right-circle me-1"></i>Ver Plan
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">No hay clientes registrados.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    $('#table-dashboard-progreso').DataTable({
+      language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+      pageLength: 10,
+      order: [[0, 'asc']]
+    });
+  });
+</script>
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Client Completion Bar Chart
+  const ctxBar = document.getElementById('chartCumplimiento').getContext('2d');
+  const labels = [{% for cp in clientes_progreso %}"{{ cp.cliente.empresa|escapejs }}",{% endfor %}];
+  const dataPct = [{% for cp in clientes_progreso %}{{ cp.porcentaje }},{% endfor %}];
+
+  new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '% Cumplimiento',
+        data: dataPct,
+        backgroundColor: '#5fcf80',
+        borderRadius: 8,
+        hoverBackgroundColor: '#3cb371'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { callback: function(val) { return val + '%'; } }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // Hitos Status Pie Chart
+  const ctxPie = document.getElementById('chartEstadoHitos').getContext('2d');
+  new Chart(ctxPie, {
+    type: 'doughnut',
+    data: {
+      labels: ['Completados', 'En Proceso', 'Pendientes'],
+      datasets: [{
+        data: [{{ objetivos_completados }}, {{ objetivos_en_proceso }}, {{ objetivos_pendientes }}],
+        backgroundColor: ['#28a745', '#ffc107', '#6c757d']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

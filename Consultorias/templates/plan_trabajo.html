@@ -1,0 +1,165 @@
+{% extends 'PlantillaGeneral.html' %}
+{% load static %}
+
+{% block title %}Plan de Trabajo - Mentor{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/jquery-ui/jquery-ui.css' %}">
+<style>
+  .sortable-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 6px solid #5fcf80;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    cursor: move;
+  }
+  .sortable-card:hover {
+    background-color: #fcfdfd;
+  }
+  .ui-sortable-placeholder {
+    border: 2px dashed #5fcf80;
+    background: #f0fdf4;
+    visibility: visible !important;
+    height: 80px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+  }
+  .drag-handle {
+    cursor: grab;
+    color: #a0aec0;
+    font-size: 1.4rem;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold mb-0"><i class="bi bi-list-task me-2 brand-accent"></i>Plan de Trabajo</h2>
+  </div>
+  <div>
+    <a href="{% url 'Consultorias:objetivo_crear' %}" target="_blank" class="btn btn-success rounded-pill px-4">
+      <i class="bi bi-plus-lg me-1"></i>Nuevo Hito
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 rounded-4 p-3 mb-4">
+  <form method="get" action="{% url 'Consultorias:plan_trabajo' %}" class="row align-items-center g-3">
+    <div class="col-md-8">
+      <label for="cliente_id" class="form-label small fw-bold text-muted mb-1"><i class="bi bi-building me-1"></i>Seleccionar Cliente Mentoreado</label>
+      <select name="cliente_id" id="cliente_id" class="form-select form-select-lg rounded-3" onchange="this.form.submit()">
+        {% for cli in clientes %}
+          <option value="{{ cli.id }}" {% if cliente_seleccionado and cliente_seleccionado.id == cli.id %}selected{% endif %}>
+            {{ cli.nombre }} - {{ cli.empresa }} ({{ cli.sector }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+</div>
+
+{% if cliente_seleccionado %}
+  <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-3 border">
+    <div>
+      <strong class="text-dark">{{ cliente_seleccionado.empresa }}</strong>
+      <span class="text-muted mx-2">|</span>
+      <span class="text-muted small">{{ cliente_seleccionado.nombre }}</span>
+      <span class="text-muted mx-2">|</span>
+      <span class="text-muted small">{{ cliente_seleccionado.consultor.nombre }}</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="small text-muted">Cumplimiento:</span>
+      <div class="progress" style="width: 100px; height: 8px;">
+        <div class="progress-bar bg-success" style="width: {{ cliente_seleccionado.porcentaje_cumplimiento_hitos }}%;"></div>
+      </div>
+      <span class="fw-bold text-success small">{{ cliente_seleccionado.porcentaje_cumplimiento_hitos }}%</span>
+    </div>
+  </div>
+
+  <!-- Sortable List Container -->
+  <div class="card border-0 rounded-4 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0"><i class="bi bi-arrow-down-up me-2 text-success"></i>Hitos de Negocio</h5>
+    </div>
+
+    <div id="sortable-objetivos">
+      {% for obj in objetivos %}
+        <div class="sortable-card d-flex align-items-center justify-content-between" data-id="{{ obj.id }}">
+          <div class="d-flex align-items-center me-3 flex-grow-1">
+            <div class="drag-handle me-3" title="Arrastrar para mover">
+              <i class="bi bi-grip-vertical"></i>
+            </div>
+            <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 38px; height: 38px; min-width: 38px;">
+              P<span class="prioridad-num">{{ obj.prioridad }}</span>
+            </div>
+            <div>
+              <h6 class="fw-bold text-dark mb-1">{{ obj.titulo }}</h6>
+              <p class="text-muted small mb-0">{{ obj.descripcion|default:""|truncatewords:15 }}</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="text-end d-none d-md-block" style="min-width: 140px;">
+              {% if obj.estado == 'COMPLETADO' %}
+                <span class="badge bg-success">Completado</span>
+              {% elif obj.estado == 'EN_PROCESO' %}
+                <span class="badge bg-warning text-dark">En Proceso</span>
+              {% else %}
+                <span class="badge bg-secondary">Pendiente</span>
+              {% endif %}
+              <div class="small text-muted mt-1">
+                {% if obj.fecha_limite %}{{ obj.fecha_limite|date:"d M Y" }}{% else %}-{% endif %}
+              </div>
+            </div>
+            <a href="{% url 'Consultorias:objetivo_editar' obj.id %}" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'Consultorias:objetivo_eliminar' obj.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
+          </div>
+        </div>
+      {% empty %}
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+          <p class="mb-2">No hay hitos registrados para este cliente.</p>
+          <a href="{% url 'Consultorias:objetivo_crear' %}" target="_blank" class="btn btn-sm btn-success rounded-pill">Agregar Primer Hito</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/jquery-ui/jquery-ui.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+  $("#sortable-objetivos").sortable({
+    handle: ".drag-handle, .sortable-card",
+    placeholder: "ui-sortable-placeholder",
+    opacity: 0.8,
+    cursor: "grabbing",
+    update: function(event, ui) {
+      $(".sortable-card").each(function(index) {
+        $(this).find(".prioridad-num").text(index + 1);
+      });
+
+      let ordenIds = [];
+      $(".sortable-card").each(function() {
+        ordenIds.push($(this).data("id"));
+      });
+
+      $.ajax({
+        url: "{% url 'Consultorias:api_objetivos_reordenar' %}",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ orden_ids: ordenIds }),
+        headers: { "X-CSRFToken": "{{ csrf_token }}" }
+      });
+    }
+  });
+});
+</script>
+{% endblock %}

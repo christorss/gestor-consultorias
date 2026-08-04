@@ -1,0 +1,44 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}Iniciar Sesión - Mentor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-md-5">
+    <div class="card border-0 shadow-lg rounded-4 p-4">
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="bi bi-person-lock fs-2"></i>
+          </div>
+          <h3 class="fw-bold">Iniciar Sesión</h3>
+          <p class="text-muted">Accede a tu plataforma de consultorías</p>
+        </div>
+
+        {% if form.errors %}
+          <div class="alert alert-danger" role="alert">
+            Usuario o contraseña incorrectos. Por favor intente de nuevo.
+          </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_username" class="form-label fw-semibold">Usuario</label>
+            <input type="text" name="username" class="form-control form-control-lg rounded-3" id="id_username" placeholder="Ingrese su usuario" required>
+          </div>
+          <div class="mb-4">
+            <label for="id_password" class="form-label fw-semibold">Contraseña</label>
+            <input type="password" name="password" class="form-control form-control-lg rounded-3" id="id_password" placeholder="Ingrese su contraseña" required>
+          </div>
+          <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill mb-3 shadow-sm">Ingresar</button>
+        </form>
+        
+        <div class="text-center mt-3">
+          <p class="text-muted small">¿No tienes una cuenta? <a href="{% url 'register' %}" class="text-success fw-bold">Regístrate aquí</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

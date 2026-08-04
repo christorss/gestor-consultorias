@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Reporte NPS - Mentor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 12px; color: #333; padding: 20px; }
+    h1 { font-size: 20px; color: #2d6a4f; margin-bottom: 3px; }
+    .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #2d6a4f; padding-bottom: 10px; }
+    .header p { font-size: 13px; color: #666; }
+    .header small { font-size: 10px; color: #999; }
+    .global { background: #2d6a4f; color: #fff; padding: 12px; text-align: center; margin-bottom: 15px; border-radius: 4px; }
+    .global h2 { font-size: 26px; margin: 0; }
+    .global p { margin: 3px 0; font-size: 13px; }
+    .consultor { margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; page-break-inside: avoid; }
+    .consultor h3 { font-size: 14px; margin-bottom: 4px; }
+    .score { font-size: 18px; font-weight: bold; }
+    .succ { color: #2d6a4f; }
+    .warn { color: #cc7b2e; }
+    .danger { color: #b02a37; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10px; }
+    th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
+    th { background: #f0f0f0; font-size: 10px; }
+    .footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 10px; color: #999; }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Mentor Consultorías</h1>
+    <p>Reporte de Satisfacción NPS</p>
+    <small>Generado el {% now "d/m/Y H:i" %}</small>
+  </div>
+
+  <div class="global">
+    <h2>{{ global_nps }}%</h2>
+    <p>NPS Global &mdash; Promedio: {{ global_promedio }} / 10 &mdash; Total: {{ total_evaluaciones }} evaluaciones</p>
+  </div>
+
+  {% for rep in reportes_nps %}
+    <div class="consultor">
+      <h3>{{ rep.consultor.nombre }}</h3>
+      <span class="score {% if rep.nps.score >= 50 %}succ{% elif rep.nps.score >= 0 %}warn{% else %}danger{% endif %}">
+        {{ rep.nps.score }}%
+      </span>
+      <span> &mdash; Promedio: {{ rep.nps.promedio }} / 10 ({{ rep.nps.total }} valoraciones)</span>
+      <span> &mdash; P: {{ rep.nps.porcentaje_promotores }}% | D: {{ rep.nps.porcentaje_detractores }}%</span>
+
+      {% if rep.sesiones_evaluadas %}
+        <table>
+          <thead>
+            <tr><th>Sesión</th><th>Cliente</th><th>Puntaje</th><th>Comentario</th></tr>
+          </thead>
+          <tbody>
+            {% for s in rep.sesiones_evaluadas %}
+              <tr>
+                <td>{{ s.titulo }}</td>
+                <td>{{ s.cliente.nombre|default:"—" }}</td>
+                <td>{{ s.calificacion_nps }}/10</td>
+                <td>{{ s.feedback_cliente|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <div class="footer">
+    Mentor Consultorías — Gestor de Consultorías de Negocios y Mentores
+  </div>
+
+  <button class="no-print" onclick="window.print()" style="display:block;margin:20px auto;padding:10px 24px;font-size:14px;cursor:pointer;border:1px solid #2d6a4f;background:#2d6a4f;color:#fff;border-radius:4px;">Imprimir / Guardar PDF</button>
+
+  <script>
+    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}{% if cliente %}Editar{% else %}Nuevo{% endif %} Cliente Mentoreado - Mentor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-7">
+    <div class="card p-4">
+      <div class="card-body">
+        <h3 class="fw-bold mb-4">{% if cliente %}Editar{% else %}Nuevo{% endif %} Cliente Mentoreado</h3>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          {% if errors %}
+            <div class="alert alert-danger py-2 mb-3">Corrija los errores antes de guardar.</div>
+          {% endif %}
+          {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+          <div class="mb-3">
+            <label for="nombre" class="form-label fw-semibold">Nombre del Representante</label>
+            <input type="text" name="nombre" id="nombre" class="form-control {% if errors.nombre %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.nombre }}{% else %}{{ cliente.nombre|default:'' }}{% endif %}" required>
+            <div class="invalid-feedback">{% if errors.nombre %}{{ errors.nombre }}{% else %}Por favor ingrese el nombre.{% endif %}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="empresa" class="form-label fw-semibold">Nombre de la Empresa / Negocio</label>
+              <input type="text" name="empresa" id="empresa" class="form-control {% if errors.empresa %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.empresa }}{% else %}{{ cliente.empresa|default:'' }}{% endif %}" required>
+              <div class="invalid-feedback">{% if errors.empresa %}{{ errors.empresa }}{% else %}Por favor ingrese la empresa.{% endif %}</div>
+            </div>
+            <div class="col-md-6">
+              <label for="sector" class="form-label fw-semibold">Sector Industrial / Comercio</label>
+              <input type="text" name="sector" id="sector" class="form-control {% if errors.sector %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.sector }}{% else %}{{ cliente.sector|default:'' }}{% endif %}" placeholder="Ej. Tecnología, Retail, Salud" required>
+              <div class="invalid-feedback">{% if errors.sector %}{{ errors.sector }}{% else %}Por favor ingrese el sector.{% endif %}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+              <input type="email" name="email" id="email" class="form-control {% if errors.email %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.email }}{% else %}{{ cliente.email|default:'' }}{% endif %}" required>
+              <div class="invalid-feedback">{% if errors.email %}{{ errors.email }}{% else %}Por favor ingrese un correo electrónico.{% endif %}</div>
+            </div>
+            <div class="col-md-6">
+              <label for="telefono" class="form-label fw-semibold">Teléfono</label>
+              <input type="text" name="telefono" id="telefono" class="form-control" value="{% if form_data %}{{ form_data.telefono }}{% else %}{{ cliente.telefono|default:'' }}{% endif %}">
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label for="consultor_id" class="form-label fw-semibold">Consultor Asignado</label>
+              <select name="consultor_id" id="consultor_id" class="form-select {% if errors.consultor_id %}is-invalid{% endif %}" required>
+                {% for cons in consultores %}
+                  <option value="{{ cons.id }}" {% if form_data.consultor_id|stringformat:"s" == cons.id|stringformat:"s" %}selected{% elif cliente.consultor.id == cons.id %}selected{% endif %}>{{ cons.nombre }} ({{ cons.especialidad }})</option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">{% if errors.consultor_id %}{{ errors.consultor_id }}{% else %}Seleccione un consultor.{% endif %}</div>
+            </div>
+            {% if cliente and not form_data %}
+              <div class="col-md-6">
+                <label for="estado" class="form-label fw-semibold">Estado</label>
+                <select name="estado" id="estado" class="form-select">
+                  <option value="ACTIVO" {% if cliente.estado == 'ACTIVO' %}selected{% endif %}>Activo</option>
+                  <option value="PAUSADO" {% if cliente.estado == 'PAUSADO' %}selected{% endif %}>Pausado</option>
+                  <option value="FINALIZADO" {% if cliente.estado == 'FINALIZADO' %}selected{% endif %}>Finalizado</option>
+                </select>
+              </div>
+            {% endif %}
+          </div>
+          <hr class="my-4">
+          <h5 class="fw-bold mb-3">Usuario de acceso</h5>
+          {% if cliente and cliente.user %}
+            <div class="alert alert-info">Vinculado al usuario <strong>{{ cliente.user.username }}</strong></div>
+          {% else %}
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="username" class="form-label fw-semibold">Nombre de usuario</label>
+                <input type="text" name="username" id="username" class="form-control" value="{% if form_data %}{{ form_data.username }}{% endif %}" placeholder="Opcional">
+              </div>
+              <div class="col-md-6">
+                <label for="password" class="form-label fw-semibold">Contraseña</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Opcional">
+              </div>
+            </div>
+            <small class="text-muted">Deja ambos en blanco si no quieres crear acceso.</small>
+          {% endif %}
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="{% url 'Consultorias:clientes_lista' %}" class="btn btn-secondary px-4">Cancelar</a>
+            <button type="submit" class="btn btn-success px-4">Guardar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

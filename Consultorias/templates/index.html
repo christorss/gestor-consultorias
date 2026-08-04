@@ -1,0 +1,439 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Inicio - Gestor de Consultorías de Negocios y Mentores</title>
+  <meta name="description" content="Gestor de Consultorías de Negocios y Mentores - Plataforma integral de mentoría empresarial">
+  <meta name="keywords" content="consultoría, mentoría, negocios, emprendimiento, gestión">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'Consultorias:index' %}" class="logo d-flex align-items-center me-auto">
+        <h1 class="sitename">Mentor</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'Consultorias:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+            {% if user_role == 'cliente' %}
+              <li><a href="{% url 'Consultorias:calendario' %}" class="{% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">Mis Sesiones</a></li>
+              <li><a href="{% url 'Consultorias:plan_trabajo' %}" class="{% if request.resolver_match.url_name == 'plan_trabajo' %}active{% endif %}">Objetivos</a></li>
+              <li><a href="{% url 'Consultorias:avances_cliente' %}" class="{% if request.resolver_match.url_name == 'avances_cliente' %}active{% endif %}">Entregables</a></li>
+              <li><a href="{% url 'Consultorias:calificar_nps' %}" class="{% if request.resolver_match.url_name == 'calificar_nps' %}active{% endif %}">Calificar Sesiones</a></li>
+            {% else %}
+              <li><a href="{% url 'Consultorias:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard Hitos</a></li>
+              <li><a href="{% url 'Consultorias:calendario' %}" class="{% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">Calendario</a></li>
+              <li><a href="{% url 'Consultorias:plan_trabajo' %}" class="{% if request.resolver_match.url_name == 'plan_trabajo' %}active{% endif %}">Objetivos</a></li>
+              <li><a href="{% url 'Consultorias:notas_sesion' %}" class="{% if request.resolver_match.url_name == 'notas_sesion' %}active{% endif %}">Notas Sesión</a></li>
+              <li><a href="{% url 'Consultorias:reportes_nps' %}" class="{% if request.resolver_match.url_name == 'reportes_nps' %}active{% endif %}">NPS Consultores</a></li>
+
+              <li class="dropdown"><a href="#"><span>Entidades</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="{% url 'Consultorias:consultores_lista' %}">Consultores</a></li>
+                  <li><a href="{% url 'Consultorias:clientes_lista' %}">Clientes Mentoreados</a></li>
+                  <li><a href="{% url 'Consultorias:sesiones_lista' %}">Sesiones</a></li>
+                </ul>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      {% if user.is_authenticated %}
+        <div class="d-flex align-items-center ms-3">
+          <span class="text-muted me-3 small fw-bold"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+          <a class="btn-get-started bg-secondary border-0 text-white" href="{% url 'logout' %}">Salir</a>
+        </div>
+      {% else %}
+        <a class="btn-get-started" href="{% url 'login' %}">Iniciar Sesión</a>
+      {% endif %}
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+      <img src="{% static 'assets/img/hero-bg.jpg' %}" alt="" data-aos="fade-in">
+      <div class="container">
+        <h2 data-aos="fade-up" data-aos-delay="100">Gestión Integral de<br>Consultorías y Mentorías</h2>
+        <p data-aos="fade-up" data-aos-delay="200">Plataforma empresarial para gestionar consultores, clientes mentoreados, sesiones, planes de trabajo y reportes ejecutivos de NPS.</p>
+        <div class="d-flex mt-4" data-aos="fade-up" data-aos-delay="300">
+          {% if user.is_authenticated %}
+            {% if user_role == 'cliente' %}
+              <a href="{% url 'Consultorias:calendario' %}" class="btn-get-started">Ir a Mis Sesiones</a>
+            {% else %}
+              <a href="{% url 'Consultorias:dashboard' %}" class="btn-get-started">Ir al Dashboard</a>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'register' %}" class="btn-get-started">Comenzar Ahora</a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-up" data-aos-delay="100">
+            <img src="{% static 'assets/img/about.jpg' %}" class="img-fluid" alt="">
+          </div>
+          <div class="col-lg-6 order-2 order-lg-1 content" data-aos="fade-up" data-aos-delay="200">
+            <h3>Plataforma integral para la gestión de consultorías empresariales</h3>
+            <p class="fst-italic">
+              Administre consultores, clientes mentoreados, sesiones individuales y grupales, objetivos de negocio y entregables desde un solo lugar.
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> <span>Gestión completa de consultores y mentores con perfiles detallados y tarifas.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>Sesiones de mentoría individuales y grupales con calendario interactivo FullCalendar.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>Planes de trabajo con priorización dinámica mediante Drag & Drop y reportes de NPS.</span></li>
+            </ul>
+            <a href="#features" class="read-more"><span>Conocer más</span><i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Counts Section -->
+    <section id="counts" class="section counts light-background">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="{{ stats.total_consultores|default:0 }}" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Consultores Expertos</p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="{{ stats.total_clientes|default:0 }}" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Clientes Mentoreados</p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="{{ stats.total_sesiones|default:0 }}" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Sesiones Realizadas</p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="{{ stats.total_objetivos|default:0 }}" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Hitos de Negocio</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Us Section -->
+    <section id="why-us" class="section why-us">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="why-box">
+              <h3>¿Por qué elegir Mentor Consultorías?</h3>
+              <p>
+                Nuestra plataforma integra las mejores herramientas tecnológicas para facilitar la gestión integral de procesos de consultoría y mentoría empresarial. Desde el agendamiento de sesiones hasta el seguimiento de objetivos y la medición de satisfacción NPS, todo en un solo ecosistema.
+              </p>
+              <div class="text-center">
+                <a href="#features" class="more-btn"><span>Conocer más</span> <i class="bi bi-chevron-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 d-flex align-items-stretch">
+            <div class="row gy-4" data-aos="fade-up" data-aos-delay="200">
+              <div class="col-xl-4">
+                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
+                  <i class="bi bi-calendar-event"></i>
+                  <h4>Agendamiento Inteligente</h4>
+                  <p>Calendario interactivo con FullCalendar para programar sesiones individuales y grupales con facilidad.</p>
+                </div>
+              </div>
+              <div class="col-xl-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
+                  <i class="bi bi-arrow-down-up"></i>
+                  <h4>Priorización Dinámica</h4>
+                  <p>Planes de trabajo con reordenamiento Drag & Drop vía jQuery UI para establecer prioridades al instante.</p>
+                </div>
+              </div>
+              <div class="col-xl-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
+                  <i class="bi bi-star-fill"></i>
+                  <h4>Reportes NPS</h4>
+                  <p>Medición de satisfacción de clientes con Net Promoter Score por consultor y métricas globales.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Características</h2>
+        <p>Herramientas Especializadas</p>
+      </div>
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="features-item">
+              <i class="bi bi-calendar3" style="color: #ffbb2c;"></i>
+              <h3><a href="{% url 'Consultorias:calendario' %}" class="stretched-link">FullCalendar</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="features-item">
+              <i class="bi bi-arrow-down-up" style="color: #5578ff;"></i>
+              <h3><a href="{% url 'Consultorias:plan_trabajo' %}" class="stretched-link">jQuery UI Sortable</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="features-item">
+              <i class="bi bi-keyboard" style="color: #e80368;"></i>
+              <h3><a href="{% url 'Consultorias:notas_sesion' %}" class="stretched-link">Hotkeys-js</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="features-item">
+              <i class="bi bi-signpost-split" style="color: #e361ff;"></i>
+              <h3><a href="{% url 'Consultorias:avances_cliente' %}" class="stretched-link">Driver.js</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="500">
+            <div class="features-item">
+              <i class="bi bi-speedometer2" style="color: #47aeff;"></i>
+              <h3><a href="{% url 'Consultorias:dashboard' %}" class="stretched-link">Dashboard Hitos</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="600">
+            <div class="features-item">
+              <i class="bi bi-star-fill" style="color: #ffa76e;"></i>
+              <h3><a href="{% url 'Consultorias:reportes_nps' %}" class="stretched-link">Reportes NPS</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="700">
+            <div class="features-item">
+              <i class="bi bi-people" style="color: #11dbcf;"></i>
+              <h3><a href="{% url 'Consultorias:consultores_lista' %}" class="stretched-link">Consultores</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="800">
+            <div class="features-item">
+              <i class="bi bi-building" style="color: #4233ff;"></i>
+              <h3><a href="{% url 'Consultorias:clientes_lista' %}" class="stretched-link">Clientes</a></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Courses Section / Services -->
+    <section id="courses" class="courses section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Servicios</h2>
+        <p>Módulos de la Plataforma</p>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="zoom-in" data-aos-delay="100">
+            <div class="course-item">
+              <img src="{% static 'assets/img/course-1.jpg' %}" class="img-fluid" alt="...">
+              <div class="course-content">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="category">Planificación</p>
+                  <p class="price">Gratuito</p>
+                </div>
+                <h3><a href="{% url 'Consultorias:plan_trabajo' %}">Plan de Trabajo</a></h3>
+                <p class="description">Gestión de objetivos con priorización dinámica mediante arrastrar y soltar. Seguimiento visual del progreso de cada hito.</p>
+                <div class="trainer d-flex justify-content-between align-items-center">
+                  <div class="trainer-profile d-flex align-items-center">
+                    <i class="bi bi-list-task fs-4 me-2" style="color: #5fcf80;"></i>
+                    <span>Prioridades</span>
+                  </div>
+                  <div class="trainer-rank d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill" style="color: #5fcf80;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4 mt-md-0" data-aos="zoom-in" data-aos-delay="200">
+            <div class="course-item">
+              <img src="{% static 'assets/img/course-2.jpg' %}" class="img-fluid" alt="...">
+              <div class="course-content">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="category">Productividad</p>
+                  <p class="price">Gratuito</p>
+                </div>
+                <h3><a href="{% url 'Consultorias:notas_sesion' %}">Notas de Sesión</a></h3>
+                <p class="description">Tomador de notas ágil con atajos de teclado (Alt+S, Alt+N, Alt+C). Ideal para sesiones de mentoría rápidas y eficientes.</p>
+                <div class="trainer d-flex justify-content-between align-items-center">
+                  <div class="trainer-profile d-flex align-items-center">
+                    <i class="bi bi-keyboard fs-4 me-2" style="color: #5fcf80;"></i>
+                    <span>Hotkeys</span>
+                  </div>
+                  <div class="trainer-rank d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill" style="color: #5fcf80;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4 mt-lg-0" data-aos="zoom-in" data-aos-delay="300">
+            <div class="course-item">
+              <img src="{% static 'assets/img/course-3.jpg' %}" class="img-fluid" alt="...">
+              <div class="course-content">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="category">Seguimiento</p>
+                  <p class="price">Gratuito</p>
+                </div>
+                <h3><a href="{% url 'Consultorias:avances_cliente' %}">Subir Avances</a></h3>
+                <p class="description">Tour interactivo guiado para que los clientes suban entregables y evidencias de avance con la biblioteca Driver.js.</p>
+                <div class="trainer d-flex justify-content-between align-items-center">
+                  <div class="trainer-profile d-flex align-items-center">
+                    <i class="bi bi-cloud-upload fs-4 me-2" style="color: #5fcf80;"></i>
+                    <span>Driver.js</span>
+                  </div>
+                  <div class="trainer-rank d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill" style="color: #5fcf80;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trainers Index Section / Consultores -->
+    <section id="trainers" class="section trainers-index">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Consultores</h2>
+        <p>Nuestros Mentores Expertos</p>
+      </div>
+      <div class="container">
+        <div class="row">
+          {% for consultor in consultores %}
+            <div class="col-lg-4 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+              <div class="member">
+                <div class="member-content text-center">
+                  <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                    {{ consultor.nombre|slice:":1" }}
+                  </div>
+                  <h4>{{ consultor.nombre }}</h4>
+                  <span>{{ consultor.especialidad }}</span>
+                  <p>{{ consultor.biografia|default:"Consultor experto en aceleración estratégica de negocios y mentoreo individualizado."|truncatewords:20 }}</p>
+                  <div class="d-flex justify-content-center gap-3 mb-2">
+                    <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>NPS: {{ consultor.calcular_nps.score }}%</span>
+                    <span class="text-success fw-bold"><i class="bi bi-currency-dollar"></i>{{ consultor.tarifa_hora }}/hr</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="col-12 text-center py-5">
+              <p class="text-muted fs-5">No hay consultores registrados aún. Se generarán al iniciar datos iniciales.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" class="footer position-relative light-background">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="{% url 'Consultorias:index' %}" class="logo d-flex align-items-center">
+            <span class="sitename">Mentor</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>Plataforma de Gestión de Consultorías</p>
+            <p>y Mentorías Empresariales</p>
+            <p class="mt-3"><strong>Email:</strong> <span>contacto@mentorconsultorias.com</span></p>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Enlaces</h4>
+          <ul>
+            <li><a href="{% url 'Consultorias:index' %}">Inicio</a></li>
+            <li><a href="#about">Acerca de</a></li>
+            <li><a href="{% url 'Consultorias:dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'Consultorias:reportes_nps' %}">Reportes NPS</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Módulos</h4>
+          <ul>
+            <li><a href="{% url 'Consultorias:calendario' %}">Calendario</a></li>
+            <li><a href="{% url 'Consultorias:plan_trabajo' %}">Plan de Trabajo</a></li>
+            <li><a href="{% url 'Consultorias:notas_sesion' %}">Notas de Sesión</a></li>
+            <li><a href="{% url 'Consultorias:avances_cliente' %}">Subir Avances</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4 col-md-12 footer-newsletter">
+          <h4>Gestor de Consultorías</h4>
+          <p>Plataforma integral desarrollada con Django, Bootstrap, FullCalendar, jQuery UI, Hotkeys-js y Driver.js para la gestión eficiente de procesos de mentoría empresarial.</p>
+        </div>
+      </div>
+    </div>
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">Mentor Consultorías</strong> <span>Todos los Derechos Reservados</span></p>
+      <div class="credits">
+        Diseñado por <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+</body>
+</html>

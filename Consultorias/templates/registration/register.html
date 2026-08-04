@@ -1,0 +1,97 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}Registro - Mentor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-lg rounded-4 p-4">
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="bi bi-person-plus fs-2"></i>
+          </div>
+          <h3 class="fw-bold">Crear Cuenta</h3>
+          <p class="text-muted">Únete como Consultor o Cliente Mentoreado</p>
+        </div>
+
+        <div id="register-alert" class="alert alert-danger d-none"></div>
+
+        <form id="register-form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="nombre" class="form-label fw-semibold">Nombre Completo</label>
+            <input type="text" id="nombre" name="nombre" class="form-control rounded-3" placeholder="Ej. Ana María Torres" required>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="username" class="form-label fw-semibold">Nombre de Usuario</label>
+              <input type="text" id="username" name="username" class="form-control rounded-3" placeholder="Ej. atorres" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+              <input type="email" id="email" name="email" class="form-control rounded-3" placeholder="ana@ejemplo.com" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="rol" class="form-label fw-semibold">Tipo de Cuenta</label>
+            <select id="rol" name="rol" class="form-select rounded-3">
+              <option value="CLIENTE">Cliente Mentoreado (Emprendedor / Negocio)</option>
+              <option value="CONSULTOR">Consultor / Mentor de Negocios</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label fw-semibold">Contraseña</label>
+            <input type="password" id="password" name="password" class="form-control rounded-3" placeholder="Mínimo 6 caracteres" required>
+          </div>
+          <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow-sm">Registrarse</button>
+        </form>
+
+        <div class="text-center mt-3">
+          <p class="text-muted small">¿Ya tienes cuenta? <a href="{% url 'login' %}" class="text-success fw-bold">Inicia sesión</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('register-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const alertBox = document.getElementById('register-alert');
+  alertBox.classList.add('d-none');
+
+  const payload = {
+    nombre: document.getElementById('nombre').value,
+    username: document.getElementById('username').value,
+    email: document.getElementById('email').value,
+    rol: document.getElementById('rol').value,
+    password: document.getElementById('password').value,
+  };
+
+  fetch("{% url 'register' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.location.href = data.redirect_url;
+    } else {
+      alertBox.textContent = data.error || 'Ocurrió un error al registrarse.';
+      alertBox.classList.remove('d-none');
+    }
+  })
+  .catch(err => {
+    alertBox.textContent = 'Error de conexión con el servidor.';
+    alertBox.classList.remove('d-none');
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Reporte NPS</title>
+  <style>
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #333; padding: 20px; }
+    h1 { font-size: 22px; color: #2d6a4f; margin-bottom: 5px; }
+    h2 { font-size: 16px; color: #333; margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    .global { background: #2d6a4f; color: white; padding: 12px; text-align: center; border-radius: 6px; margin-bottom: 20px; }
+    .global h1 { color: white; margin: 0; font-size: 28px; }
+    .global p { margin: 3px 0; font-size: 13px; }
+    .consultor { margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    .consultor h3 { margin: 0 0 5px 0; font-size: 14px; }
+    .consultor .nps-score { font-size: 18px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+    th, td { border: 1px solid #ddd; padding: 5px; text-align: left; }
+    th { background: #f0f0f0; }
+    .text-success { color: #2d6a4f; }
+    .text-warning { color: #cc7b2e; }
+    .text-danger { color: #b02a37; }
+  </style>
+</head>
+<body>
+  <h1>Mentor Consultorías</h1>
+  <p>Reporte de Satisfacción NPS</p>
+  <small>Generado el {% now "d/m/Y H:i" %}</small>
+
+  <div class="global">
+    <h1>{{ global_nps }}%</h1>
+    <p>NPS Global — Promedio: {{ global_promedio }} / 10 — Total: {{ total_evaluaciones }} evaluaciones</p>
+  </div>
+
+  {% for rep in reportes_nps %}
+    <div class="consultor">
+      <h3>{{ rep.consultor.nombre }}</h3>
+      <span class="nps-score {% if rep.nps.score >= 50 %}text-success{% elif rep.nps.score >= 0 %}text-warning{% else %}text-danger{% endif %}">
+        {{ rep.nps.score }}%
+      </span>
+      <span> — Promedio: {{ rep.nps.promedio }} / 10 ({{ rep.nps.total }} valoraciones)</span>
+      <span>P: {{ rep.nps.porcentaje_promotores }}% | D: {{ rep.nps.porcentaje_detractores }}%</span>
+
+      {% if rep.sesiones_evaluadas %}
+        <table>
+          <tr><th>Sesión</th><th>Cliente</th><th>Puntaje</th><th>Comentario</th></tr>
+          {% for s in rep.sesiones_evaluadas %}
+            <tr>
+              <td>{{ s.titulo }}</td>
+              <td>{{ s.cliente.nombre|default:"—" }}</td>
+              <td>{{ s.calificacion_nps }}/10</td>
+              <td>{{ s.feedback_cliente|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  {% endfor %}
+</body>
+</html>

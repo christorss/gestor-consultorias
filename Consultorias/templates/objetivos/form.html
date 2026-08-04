@@ -1,0 +1,83 @@
+{% extends 'PlantillaGeneral.html' %}
+
+{% block title %}{% if objetivo %}Editar{% else %}Nuevo{% endif %} Hito / Objetivo - Mentor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-7">
+    <div class="card border-0 rounded-4 p-4">
+      <div class="card-body">
+        <h3 class="fw-bold mb-4"><i class="bi bi-bullseye me-2 text-success"></i>{% if objetivo %}Editar{% else %}Nuevo{% endif %} Hito de Negocio</h3>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          {% if errors %}
+            <div class="alert alert-danger py-2 mb-3">Corrija los errores antes de guardar.</div>
+          {% endif %}
+          <div class="mb-3">
+            <label for="cliente_id" class="form-label fw-semibold">Cliente Mentoreado</label>
+            <select name="cliente_id" id="cliente_id" class="form-select rounded-3 {% if errors.cliente_id %}is-invalid{% endif %}" required>
+              <option value="">Seleccione un cliente...</option>
+              {% for cli in clientes %}
+                <option value="{{ cli.id }}" {% if form_data.cliente_id|stringformat:"s" == cli.id|stringformat:"s" %}selected{% elif objetivo.cliente.id == cli.id %}selected{% endif %}>{{ cli.nombre }} - {{ cli.empresa }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">{% if errors.cliente_id %}{{ errors.cliente_id }}{% else %}Seleccione un cliente mentoreado.{% endif %}</div>
+          </div>
+          <div class="mb-3">
+            <label for="titulo" class="form-label fw-semibold">Título del Hito / Objetivo</label>
+            <input type="text" name="titulo" id="titulo" class="form-control rounded-3 {% if errors.titulo %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.titulo }}{% else %}{{ objetivo.titulo|default:'' }}{% endif %}" required placeholder="Ej. Lanzamiento de Plataforma E-commerce">
+            <div class="invalid-feedback">{% if errors.titulo %}{{ errors.titulo }}{% else %}Por favor ingrese un título para el hito.{% endif %}</div>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label fw-semibold">Descripción del Hito</label>
+            <textarea name="descripcion" id="descripcion" class="form-control rounded-3" rows="3">{% if form_data %}{{ form_data.descripcion }}{% else %}{{ objetivo.descripcion|default:'' }}{% endif %}</textarea>
+          </div>
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <label for="estado" class="form-label fw-semibold">Estado</label>
+              <select name="estado" id="estado" class="form-select rounded-3">
+                <option value="PENDIENTE" {% if form_data.estado == 'PENDIENTE' %}selected{% elif objetivo.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                <option value="EN_PROCESO" {% if form_data.estado == 'EN_PROCESO' %}selected{% elif objetivo.estado == 'EN_PROCESO' %}selected{% endif %}>En Proceso</option>
+                <option value="COMPLETADO" {% if form_data.estado == 'COMPLETADO' %}selected{% elif objetivo.estado == 'COMPLETADO' %}selected{% endif %}>Completado</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="progreso_porcentaje" class="form-label fw-semibold">Progreso (%)</label>
+              <input type="number" min="0" max="100" name="progreso_porcentaje" id="progreso_porcentaje" class="form-control rounded-3" value="{% if form_data %}{{ form_data.progreso_porcentaje }}{% else %}{{ objetivo.progreso_porcentaje|default:0 }}{% endif %}">
+            </div>
+            <div class="col-md-4">
+              <label for="fecha_limite" class="form-label fw-semibold">Fecha Límite</label>
+              <input type="date" name="fecha_limite" id="fecha_limite" class="form-control rounded-3" value="{% if form_data %}{{ form_data.fecha_limite }}{% else %}{{ objetivo.fecha_limite|date:'Y-m-d' }}{% endif %}">
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'Consultorias:plan_trabajo' %}" class="btn btn-secondary rounded-pill px-4">Cancelar</a>
+            <button type="submit" class="btn btn-success rounded-pill px-4">Guardar Hito</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

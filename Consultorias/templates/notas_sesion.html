@@ -1,0 +1,236 @@
+{% extends 'PlantillaGeneral.html' %}
+{% load static %}
+
+{% block title %}Notas de Sesión - Mentor{% endblock %}
+
+{% block extra_head %}
+<script src="{% static 'vendor/hotkeys/hotkeys.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold mb-1"><i class="bi bi-journal-text me-2 brand-accent"></i>Notas de Sesión</h2>
+  </div>
+  <div>
+    <button type="button" class="btn btn-outline-dark rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalHotkeysHelp">
+      <i class="bi bi-keyboard me-1"></i>Atajos
+    </button>
+  </div>
+</div>
+
+<div class="alert alert-light border d-flex align-items-center gap-3 py-2 mb-4 small" role="alert">
+  <i class="bi bi-keyboard-fill text-success"></i>
+  <span class="fw-bold me-2">Comandos:</span>
+  <span class="badge bg-dark me-1">Alt+S</span> Guardar
+  <span class="badge bg-dark mx-1">Alt+N</span> Limpiar
+  <span class="badge bg-dark mx-1">Alt+C</span> Completar
+  <span class="badge bg-dark mx-1">Alt+B</span> Plantilla
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+      <h5 class="fw-bold mb-3"><i class="bi bi-card-checklist me-2 text-success"></i>Sesión</h5>
+      <select id="select-sesion" class="form-select rounded-3 mb-3" onchange="cambiarSesion(this.value)">
+        {% for s in sesiones %}
+          <option value="{{ s.id }}" {% if sesion_seleccionada and sesion_seleccionada.id == s.id %}selected{% endif %}>
+            {{ s.fecha_inicio|date:"d/m/Y H:i" }} - {{ s.titulo }}
+          </option>
+        {% endfor %}
+      </select>
+
+      {% if sesion_seleccionada %}
+        <div class="border-top pt-3">
+          <h6 class="fw-bold text-dark mb-2">{{ sesion_seleccionada.titulo }}</h6>
+          <p class="text-muted small mb-2">
+            <strong>Tipo:</strong> <span class="badge bg-light text-dark border">{{ sesion_seleccionada.get_tipo_display }}</span><br>
+            <strong>Consultor:</strong> {{ sesion_seleccionada.consultor.nombre }}<br>
+            <strong>Cliente:</strong> {% if sesion_seleccionada.cliente %}{{ sesion_seleccionada.cliente.nombre }} ({{ sesion_seleccionada.cliente.empresa }}){% else %}Grupal{% endif %}<br>
+            <strong>Modalidad:</strong> {{ sesion_seleccionada.get_modalidad_display }}
+          </p>
+          <div class="mb-3">
+            <span class="small text-muted fw-bold">Estado:</span>
+            <span id="badge-estado-sesion" class="badge {% if sesion_seleccionada.estado == 'COMPLETADA' %}bg-success{% else %}bg-warning text-dark{% endif %} ms-2">
+              {{ sesion_seleccionada.get_estado_display }}
+            </span>
+          </div>
+          {% if sesion_seleccionada.enlace_reunion %}
+            <a href="{{ sesion_seleccionada.enlace_reunion }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill w-100 mb-2">
+              <i class="bi bi-camera-video me-1"></i>Unirse a la Reunión
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2 text-success"></i>Editor</h5>
+        <div id="status-saving" class="small text-muted fw-bold">
+          <i class="bi bi-circle-fill text-success me-1"></i>Listo
+        </div>
+      </div>
+
+      <input type="hidden" id="sesion-id-input" value="{{ sesion_seleccionada.id|default:'' }}">
+      
+      <div class="mb-3">
+        <textarea id="editor-notas" class="form-control rounded-3 font-monospace p-3" rows="14" placeholder="Escriba las notas de la sesión aquí...">{{ sesion_seleccionada.notas_sesion|default:'' }}</textarea>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center pt-2">
+        <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm" onclick="insertarPlantilla()">
+          <i class="bi bi-journal-plus me-1"></i>Plantilla
+        </button>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-success rounded-pill" onclick="marcarCompletada()">
+            <i class="bi bi-check-lg me-1"></i>Completar
+          </button>
+          <button type="button" class="btn btn-success rounded-pill px-4 shadow-sm" onclick="guardarNotas()">
+            <i class="bi bi-save me-1"></i>Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalHotkeysHelp" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header bg-dark text-white rounded-top-4">
+        <h5 class="modal-title fw-bold"><i class="bi bi-keyboard me-2 brand-accent"></i>Atajos de Teclado</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <span>Guardar notas</span>
+            <span class="badge bg-dark">Alt + S</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <span>Limpiar editor</span>
+            <span class="badge bg-dark">Alt + N</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <span>Marcar como completada</span>
+            <span class="badge bg-dark">Alt + C</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <span>Insertar plantilla</span>
+            <span class="badge bg-dark">Alt + B</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  hotkeys.filter = function() { return true; };
+  hotkeys('alt+s, ctrl+s, alt+n, alt+c, alt+b', function(event, handler) {
+    event.preventDefault();
+    switch (handler.key) {
+      case 'alt+s':
+      case 'ctrl+s':
+        guardarNotas();
+        break;
+      case 'alt+n':
+        Swal.fire({
+          title: 'Limpiar editor',
+          text: '¿Desea limpiar el editor de notas?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, limpiar',
+          cancelButtonText: 'Cancelar'
+        }).then(r => {
+          if (r.isConfirmed) {
+            document.getElementById('editor-notas').value = '';
+            Swal.fire('Listo', 'Editor limpiado', 'success');
+          }
+        });
+        break;
+      case 'alt+c':
+        marcarCompletada();
+        break;
+      case 'alt+b':
+        insertarPlantilla();
+        break;
+    }
+  });
+});
+
+function cambiarSesion(sesionId) {
+  window.location.href = "{% url 'Consultorias:notas_sesion' %}" + sesionId + "/";
+}
+
+function guardarNotas(nuevoEstado = null) {
+  const sesionId = document.getElementById('sesion-id-input').value;
+  const notas = document.getElementById('editor-notas').value;
+
+  if (!sesionId) {
+    Swal.fire('Atención', 'Seleccione una sesión.', 'warning');
+    return;
+  }
+
+  const payload = { sesion_id: sesionId, notas: notas };
+  if (nuevoEstado) payload.estado = nuevoEstado;
+
+  Swal.fire({ title: 'Guardando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+  fetch("{% url 'Consultorias:api_notas_guardar' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire('Guardado', 'Notas guardadas correctamente.', 'success');
+      if (nuevoEstado === 'COMPLETADA') {
+        const badge = document.getElementById('badge-estado-sesion');
+        if (badge) {
+          badge.textContent = 'Completada';
+          badge.className = 'badge bg-success ms-2';
+        }
+      }
+    } else {
+      Swal.fire('Error', data.error || 'No se pudo guardar.', 'error');
+    }
+  })
+  .catch(() => Swal.fire('Error', 'Error de conexión con el servidor.', 'error'));
+}
+
+function marcarCompletada() {
+  Swal.fire({
+    title: 'Completar sesión',
+    text: '¿Marcar esta sesión como COMPLETADA?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#28a745',
+    confirmButtonText: 'Sí, completar',
+    cancelButtonText: 'Cancelar'
+  }).then(r => {
+    if (r.isConfirmed) {
+      guardarNotas('COMPLETADA');
+    }
+  });
+}
+
+function insertarPlantilla() {
+  const editor = document.getElementById('editor-notas');
+  const template = '\n--- REGISTRO DE SESIÓN ---\n[DIAGNOSTICO]: \n- \n\n[ACUERDOS Y COMPROMISOS]:\n1. \n2. \n\n[PROXIMOS PASOS]:\n- \n-------------------------\n';
+  editor.value += template;
+  editor.focus();
+  Swal.fire('Insertada', 'Plantilla de registro agregada.', 'info');
+}
+</script>
+{% endblock %}
