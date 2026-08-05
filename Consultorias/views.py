@@ -10,9 +10,11 @@ from django.conf import settings
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from xhtml2pdf import pisa
+import base64
 import io
 import json
 import logging
+import qrcode
 
 from .models import Consultor, ClienteMentoreado, Objetivo, Entregable, SesionMentoria, get_user_role
 
@@ -194,6 +196,17 @@ def reportes_nps_pdf(request):
         f'Total de evaluaciones: {total_evaluaciones}\n'
         f'Generado: {fecha_generacion}'
     )
+    qr = qrcode.QRCode(
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=8,
+        border=4,
+    )
+    qr.add_data(qr_text)
+    qr.make(fit=True)
+    qr_buffer = io.BytesIO()
+    qr.make_image(fill_color='black', back_color='white').save(qr_buffer, format='PNG')
+    qr_data_uri = 'data:image/png;base64,' + base64.b64encode(qr_buffer.getvalue()).decode('ascii')
 
     return render(request, 'reportes_nps_print.html', {
         'reportes_nps': reportes,
@@ -201,7 +214,7 @@ def reportes_nps_pdf(request):
         'global_promedio': global_promedio,
         'total_evaluaciones': total_evaluaciones,
         'fecha_generacion': fecha_generacion,
-        'qr_text': qr_text,
+        'qr_data_uri': qr_data_uri,
     })
 
 
