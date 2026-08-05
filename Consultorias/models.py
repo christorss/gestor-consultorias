@@ -194,7 +194,6 @@ class SesionMentoria(models.Model):
             'consultor_nombre': self.nombre_consultor(),
             'cliente_id': self.cliente.id if self.cliente else None,
             'modalidad': self.modalidad,
-            'enlace_reunion': self.enlace_reunion,
             'estado': self.estado,
             'notas_sesion': self.notas_sesion,
             'backgroundColor': '#5fcf80' if self.tipo == 'INDIVIDUAL' else '#007bff',

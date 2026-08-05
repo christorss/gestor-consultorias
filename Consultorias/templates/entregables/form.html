@@ -39,13 +39,9 @@
             <input type="text" name="titulo" id="titulo" class="form-control {% if errors.titulo %}is-invalid{% endif %}" value="{% if form_data %}{{ form_data.titulo }}{% endif %}" required>
             <div class="invalid-feedback">{% if errors.titulo %}{{ errors.titulo }}{% else %}Por favor ingrese un título.{% endif %}</div>
           </div>
-          <div class="mb-3">
-            <label for="enlace_externo" class="form-label fw-semibold">Enlace Externo</label>
-            <input type="url" name="enlace_externo" id="enlace_externo" class="form-control" value="{% if form_data %}{{ form_data.enlace_externo }}{% endif %}" placeholder="https://...">
-          </div>
           <div class="mb-4">
             <label for="archivo" class="form-label fw-semibold">Archivo Adjunto (solo PDF)</label>
-            <input type="file" name="archivo" id="archivo" class="form-control {% if errors.archivo %}is-invalid{% endif %}" accept=".pdf">
+            <input type="file" name="archivo" id="archivo" class="form-control {% if errors.archivo %}is-invalid{% endif %}" accept=".pdf,application/pdf" required>
             <div class="invalid-feedback">{% if errors.archivo %}{{ errors.archivo }}{% else %}Solo se permiten archivos PDF.{% endif %}</div>
           </div>
         {% else %}

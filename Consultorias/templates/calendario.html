@@ -125,18 +125,12 @@
             </div>
           </div>
 
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="sesion-modalidad" class="form-label fw-semibold">Modalidad</label>
-              <select id="sesion-modalidad" class="form-select rounded-3">
-                <option value="VIRTUAL">Virtual (Meet / Zoom)</option>
-                <option value="PRESENCIAL">Presencial</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label for="sesion-enlace" class="form-label fw-semibold">Enlace de Reunión</label>
-              <input type="url" id="sesion-enlace" class="form-control rounded-3" placeholder="https://meet.google.com/xyz...">
-            </div>
+          <div class="mb-3">
+            <label for="sesion-modalidad" class="form-label fw-semibold">Modalidad</label>
+            <select id="sesion-modalidad" class="form-select rounded-3">
+              <option value="VIRTUAL">Virtual</option>
+              <option value="PRESENCIAL">Presencial</option>
+            </select>
           </div>
         </form>
       </div>
@@ -208,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('sesion-consultor').value = ev.consultor_id || '';
       document.getElementById('sesion-cliente').value = ev.cliente_id || '';
       document.getElementById('sesion-modalidad').value = ev.modalidad || 'VIRTUAL';
-      document.getElementById('sesion-enlace').value = ev.enlace_reunion || '';
 
       if (info.event.start) {
         document.getElementById('sesion-inicio').value = info.event.start.toISOString().substring(0, 16);
@@ -264,7 +257,6 @@ function guardarSesion() {
     fecha_inicio: document.getElementById('sesion-inicio').value,
     fecha_fin: document.getElementById('sesion-fin').value,
     modalidad: document.getElementById('sesion-modalidad').value,
-    enlace_reunion: document.getElementById('sesion-enlace').value,
   };
 
   if (!payload.titulo || !payload.consultor_id || !payload.fecha_inicio || !payload.fecha_fin) {

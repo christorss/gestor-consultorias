@@ -125,7 +125,6 @@ class Command(BaseCommand):
                 titulo='Plan_Financiero_v1.pdf',
                 defaults={
                     'descripcion': 'Archivo del plan financiero en formato PDF.',
-                    'enlace_externo': 'https://drive.google.com/ejemplo',
                     'estado': 'APROBADO',
                     'comentarios_consultor': 'Buen trabajo en los cálculos.'
                 }
@@ -143,7 +142,6 @@ class Command(BaseCommand):
                 'fecha_inicio': now - timedelta(days=5),
                 'fecha_fin': now - timedelta(days=5, hours=-1),
                 'modalidad': 'VIRTUAL',
-                'enlace_reunion': 'https://meet.google.com/abc-123',
                 'estado': 'COMPLETADA',
                 'notas_sesion': 'Se revisó el flujo de caja del primer trimestre.',
                 'calificacion_nps': 10,
@@ -160,7 +158,6 @@ class Command(BaseCommand):
                 'fecha_inicio': now - timedelta(days=2),
                 'fecha_fin': now - timedelta(days=2, hours=-1),
                 'modalidad': 'VIRTUAL',
-                'enlace_reunion': 'https://meet.google.com/xyz-789',
                 'estado': 'COMPLETADA',
                 'notas_sesion': 'Revisión de facturas y gastos mensuales.',
                 'calificacion_nps': 9,

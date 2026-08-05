@@ -59,8 +59,8 @@
             <td>{{ ent.objetivo.titulo }}</td>
             <td>
               <div class="fw-semibold">{{ ent.titulo }}</div>
-              {% if ent.enlace_externo %}
-                <a href="{{ ent.enlace_externo }}" target="_blank" class="small">Ver Enlace</a>
+              {% if ent.archivo %}
+                <a href="{{ ent.archivo.url }}" download class="small">Descargar PDF</a>
               {% endif %}
             </td>
             <td>

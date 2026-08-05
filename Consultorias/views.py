@@ -635,8 +635,7 @@ def sesion_crear(request):
             cliente=cli,
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_fin,
-            modalidad=request.POST.get('modalidad', 'VIRTUAL'),
-            enlace_reunion=request.POST.get('enlace_reunion', '')
+            modalidad=request.POST.get('modalidad', 'VIRTUAL')
         )
         return redirect('Consultorias:sesiones_lista')
     return render(request, 'sesiones/form.html', {'consultores': consultores, 'clientes': clientes})
@@ -811,8 +810,8 @@ def entregable_crear(request):
             errors['titulo'] = 'El título es obligatorio.'
         if archivo and not archivo.name.lower().endswith('.pdf'):
             errors['archivo'] = 'Solo se permiten archivos PDF.'
-        if not archivo and not request.POST.get('enlace_externo', '').strip():
-            errors['archivo'] = 'Debe adjuntar un archivo PDF o proporcionar un enlace externo.'
+        if not archivo:
+            errors['archivo'] = 'Debe adjuntar un archivo PDF.'
 
         if errors:
             return render(request, 'entregables/form.html', {
@@ -827,7 +826,6 @@ def entregable_crear(request):
             objetivo=obj,
             titulo=titulo,
             descripcion=request.POST.get('descripcion', ''),
-            enlace_externo=request.POST.get('enlace_externo', ''),
             archivo=archivo
         )
         return redirect('Consultorias:avances_cliente')
@@ -932,7 +930,6 @@ def api_entregable_subir(request):
             objetivo=obj,
             titulo=request.POST.get('titulo'),
             descripcion=request.POST.get('descripcion', ''),
-            enlace_externo=request.POST.get('enlace_externo', ''),
             archivo=request.FILES.get('archivo')
         )
         return JsonResponse({'success': True})

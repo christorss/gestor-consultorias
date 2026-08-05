@@ -22,7 +22,7 @@
           <th>Título del Entregable</th>
           <th>Cliente / Empresa</th>
           <th>Hito Asociado</th>
-          <th>Recurso / Enlace</th>
+          <th>Archivo</th>
           <th>Estado de Revisión</th>
           <th>Fecha Entrega</th>
           <th class="text-end">Acciones</th>
@@ -35,11 +35,10 @@
             <td>{{ e.cliente.nombre }} ({{ e.cliente.empresa }})</td>
             <td><span class="badge bg-light text-dark border">{{ e.objetivo.titulo }}</span></td>
             <td>
-              {% if e.enlace_externo %}
-                <a href="{{ e.enlace_externo }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-link-45deg me-1"></i>Abrir Enlace</a>
-              {% endif %}
               {% if e.archivo %}
                 <a href="{{ e.archivo.url }}" download class="btn btn-sm btn-outline-dark rounded-pill"><i class="bi bi-download me-1"></i>Archivo</a>
+              {% else %}
+                <span class="text-muted">Sin archivo</span>
               {% endif %}
             </td>
             <td>

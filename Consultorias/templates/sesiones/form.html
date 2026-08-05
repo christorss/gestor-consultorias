@@ -51,7 +51,7 @@
             <div class="col-md-6">
               <label for="modalidad" class="form-label fw-semibold">Modalidad</label>
               <select name="modalidad" id="modalidad" class="form-select rounded-3" required>
-                <option value="VIRTUAL" {% if form_data.modalidad == 'VIRTUAL' %}selected{% elif sesion.modalidad == 'VIRTUAL' %}selected{% endif %}>Virtual (Meet / Zoom)</option>
+                <option value="VIRTUAL" {% if form_data.modalidad == 'VIRTUAL' %}selected{% elif sesion.modalidad == 'VIRTUAL' %}selected{% endif %}>Virtual</option>
                 <option value="PRESENCIAL" {% if form_data.modalidad == 'PRESENCIAL' %}selected{% elif sesion.modalidad == 'PRESENCIAL' %}selected{% endif %}>Presencial</option>
               </select>
               <div class="invalid-feedback">Seleccione una modalidad.</div>
@@ -69,11 +69,6 @@
               <div class="invalid-feedback">{% if errors.fecha_fin %}{{ errors.fecha_fin }}{% else %}Ingrese la fecha y hora de fin.{% endif %}</div>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="enlace_reunion" class="form-label fw-semibold">Enlace de Reunión</label>
-            <input type="url" name="enlace_reunion" id="enlace_reunion" class="form-control rounded-3" value="{% if form_data %}{{ form_data.enlace_reunion }}{% else %}{{ sesion.enlace_reunion|default:'' }}{% endif %}" placeholder="https://meet.google.com/...">
-          </div>
-
           {% if sesion and not form_data %}
             <div class="row mb-3">
               <div class="col-md-6">
