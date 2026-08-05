@@ -103,8 +103,9 @@ class Command(BaseCommand):
             (cli3, 'Rediseño de Marca', 'Diseño de nuevo logotipo y empaques', 2, 'PENDIENTE', 0),
         ]
 
+        objetivos = {}
         for cli, tit, desc, prio, est, prog in obj_data:
-            Objetivo.objects.get_or_create(
+            objetivo, _ = Objetivo.objects.get_or_create(
                 cliente=cli,
                 titulo=tit,
                 defaults={
@@ -115,55 +116,100 @@ class Command(BaseCommand):
                     'fecha_limite': timezone.now().date() + timedelta(days=prio*10)
                 }
             )
+            objetivos[(cli.email, tit)] = objetivo
 
         # 4. Entregables
-        o1 = Objetivo.objects.filter(cliente=cli1).first()
-        if o1:
+        entregables_data = [
+            (
+                cli1, 'Diseño del Plan Financiero', 'Plan financiero y flujo de caja',
+                'Documento con presupuesto, proyecciones y flujo de caja del primer año.',
+                'APROBADO', 'Cálculos claros y supuestos correctamente sustentados.'
+            ),
+            (
+                cli1, 'Definición de Propuesta de Valor', 'Matriz de propuesta de valor',
+                'Análisis de segmentos, necesidades y diferenciadores del producto.',
+                'EN_REVISION', 'Agregar evidencia de las entrevistas realizadas a clientes.'
+            ),
+            (
+                cli2, 'Auditoría de Ventas', 'Informe de auditoría comercial',
+                'Diagnóstico del embudo comercial y oportunidades de mejora.',
+                'APROBADO', 'El diagnóstico identifica correctamente los cuellos de botella.'
+            ),
+            (
+                cli2, 'Implementar Sistema CRM', 'Plan de implementación del CRM',
+                'Cronograma, responsables y estructura inicial de la base de clientes.',
+                'PENDIENTE', ''
+            ),
+            (
+                cli3, 'Estudio de Mercado', 'Resultados del estudio de mercado',
+                'Resumen de encuestas, perfiles de cliente y conclusiones principales.',
+                'APROBADO', 'Resultados bien presentados y útiles para la toma de decisiones.'
+            ),
+        ]
+        for cli, objetivo_titulo, titulo, descripcion, estado, comentario in entregables_data:
+            objetivo = objetivos[(cli.email, objetivo_titulo)]
             Entregable.objects.get_or_create(
-                objetivo=o1,
-                cliente=cli1,
-                titulo='Plan_Financiero_v1.pdf',
+                objetivo=objetivo,
+                cliente=cli,
+                titulo=titulo,
                 defaults={
-                    'descripcion': 'Archivo del plan financiero en formato PDF.',
-                    'estado': 'APROBADO',
-                    'comentarios_consultor': 'Buen trabajo en los cálculos.'
+                    'descripcion': descripcion,
+                    'estado': estado,
+                    'comentarios_consultor': comentario
                 }
             )
 
         # 5. Sesiones con NPS
         now = timezone.now()
-        
-        SesionMentoria.objects.get_or_create(
-            titulo='Reunión de avance financiero',
-            consultor=c1,
-            cliente=cli1,
-            defaults={
-                'tipo': 'INDIVIDUAL',
-                'fecha_inicio': now - timedelta(days=5),
-                'fecha_fin': now - timedelta(days=5, hours=-1),
-                'modalidad': 'VIRTUAL',
-                'estado': 'COMPLETADA',
-                'notas_sesion': 'Se revisó el flujo de caja del primer trimestre.',
-                'calificacion_nps': 10,
-                'feedback_cliente': 'Excelente sesión de ayuda.'
-            }
-        )
+        sesiones_data = [
+            ('Diagnóstico estratégico inicial', c1, cli1, -30, 'PRESENCIAL', 'COMPLETADA', 9,
+             'Se definieron prioridades y riesgos del modelo de negocio.', 'La sesión permitió ordenar nuestras prioridades.'),
+            ('Revisión del plan financiero', c1, cli1, -12, 'VIRTUAL', 'COMPLETADA', 10,
+             'Se revisaron presupuesto, flujo de caja y punto de equilibrio.', 'Excelente orientación y recomendaciones prácticas.'),
+            ('Preparación para inversionistas', c1, cli1, 7, 'PRESENCIAL', 'PROGRAMADA', None,
+             'Se trabajará la narrativa y estructura de la presentación.', ''),
+            ('Auditoría del proceso comercial', c2, cli2, -18, 'PRESENCIAL', 'COMPLETADA', 8,
+             'Se analizaron indicadores, costos y desempeño del equipo comercial.', 'La información fue útil, aunque faltó tiempo para preguntas.'),
+            ('Configuración inicial del CRM', c2, cli2, 4, 'VIRTUAL', 'PROGRAMADA', None,
+             'Se configurarán etapas, campos y responsables del proceso.', ''),
+            ('Análisis del estudio de mercado', c3, cli3, -9, 'VIRTUAL', 'COMPLETADA', 6,
+             'Se revisaron segmentos, resultados de encuestas y competencia.', 'Necesitamos ejemplos más específicos para nuestro sector.'),
+            ('Taller de posicionamiento de marca', c3, cli3, 10, 'PRESENCIAL', 'PROGRAMADA', None,
+             'Taller para definir personalidad, mensajes y lineamientos de marca.', ''),
+        ]
 
-        SesionMentoria.objects.get_or_create(
-            titulo='Asesoría de impuestos y presupuesto',
-            consultor=c2,
-            cliente=cli2,
+        for titulo, consultor, cliente, dias, modalidad, estado, nps, notas, feedback in sesiones_data:
+            inicio = now + timedelta(days=dias)
+            SesionMentoria.objects.get_or_create(
+                titulo=titulo,
+                consultor=consultor,
+                cliente=cliente,
+                defaults={
+                    'tipo': 'INDIVIDUAL',
+                    'fecha_inicio': inicio,
+                    'fecha_fin': inicio + timedelta(hours=1),
+                    'modalidad': modalidad,
+                    'estado': estado,
+                    'notas_sesion': notas,
+                    'calificacion_nps': nps,
+                    'feedback_cliente': feedback
+                }
+            )
+
+        sesion_grupal, _ = SesionMentoria.objects.get_or_create(
+            titulo='Taller grupal de planificación empresarial',
+            consultor=c1,
+            cliente=None,
             defaults={
-                'tipo': 'INDIVIDUAL',
-                'fecha_inicio': now - timedelta(days=2),
-                'fecha_fin': now - timedelta(days=2, hours=-1),
-                'modalidad': 'VIRTUAL',
-                'estado': 'COMPLETADA',
-                'notas_sesion': 'Revisión de facturas y gastos mensuales.',
-                'calificacion_nps': 9,
-                'feedback_cliente': 'Muy clara la explicación.'
+                'tipo': 'GRUPAL',
+                'fecha_inicio': now + timedelta(days=14),
+                'fecha_fin': now + timedelta(days=14, hours=2),
+                'modalidad': 'PRESENCIAL',
+                'estado': 'PROGRAMADA',
+                'notas_sesion': 'Taller colaborativo para construir planes de acción trimestrales.'
             }
         )
+        sesion_grupal.clientes_grupales.set([cli1, cli2, cli3])
 
         # 6. Usuarios de prueba vinculados a perfiles
         u_consultor, _ = User.objects.get_or_create(
@@ -186,5 +232,23 @@ class Command(BaseCommand):
             cli1.user = u_cliente
             cli1.save()
 
+        usuarios_adicionales = [
+            ('consultor_finanzas', 'consultor123', 'elena.rostova@mail.com', c2, None),
+            ('consultor_marketing', 'consultor123', 'roberto.gomez@mail.com', c3, None),
+            ('cliente_retail', 'cliente123', 'gerencia@innovaretail.com', None, cli2),
+            ('cliente_ecofood', 'cliente123', 'info@ecofood.ec', None, cli3),
+        ]
+        for username, password, email, consultor, cliente in usuarios_adicionales:
+            usuario, creado = User.objects.get_or_create(username=username, defaults={'email': email})
+            if creado:
+                usuario.set_password(password)
+                usuario.save()
+            if consultor and consultor.user_id is None:
+                consultor.user = usuario
+                consultor.save()
+            if cliente and cliente.user_id is None:
+                cliente.user = usuario
+                cliente.save()
+
         self.stdout.write("Datos de prueba cargados correctamente.")
-        self.stdout.write("Usuarios: admin/admin123, consultor/consultor123, cliente/cliente123")
+        self.stdout.write("Se cargaron consultores, clientes, objetivos, entregables, sesiones y evaluaciones NPS.")
