@@ -8,11 +8,16 @@ from django.db.models import Q
 from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.views.decorators.http import require_POST
 from xhtml2pdf import pisa
 import io
 import json
+import logging
 
 from .models import Consultor, ClienteMentoreado, Objetivo, Entregable, SesionMentoria, get_user_role
+
+
+logger = logging.getLogger(__name__)
 
 
 # --- INICIO Y AUTENTICACION ---
@@ -221,27 +226,38 @@ def reportes_nps_pdf(request):
 
 
 @login_required
+@require_POST
 def enviar_reporte_nps(request):
     if get_user_role(request.user) == 'cliente':
-        messages.error(request, 'Sin permiso.')
-        return redirect('Consultorias:dashboard')
-    consultores = Consultor.objects.all()
-    pdf = generar_pdf_nps(request, consultores)
-    email = EmailMessage(
-        'Reporte NPS - Mentor Consultorías',
-        'Adjunto el reporte NPS de consultores.',
-        settings.EMAIL_HOST_USER,
-        ['cristophereduardo2004@gmail.com'],
-    )
-    email.attach('reporte_nps.pdf', pdf, 'application/pdf')
+        return JsonResponse({'success': False, 'error': 'No tienes permiso para enviar este reporte.'}, status=403)
+
+    if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+        return JsonResponse({
+            'success': False,
+            'error': 'El correo no está configurado en el servidor. Revisa EMAIL_HOST_USER y EMAIL_HOST_PASSWORD en Render.',
+        }, status=503)
 
     try:
+        consultores = Consultor.objects.all()
+        pdf = generar_pdf_nps(request, consultores)
+        email = EmailMessage(
+            'Reporte NPS - Mentor Consultorías',
+            'Adjunto el reporte NPS de consultores.',
+            settings.EMAIL_HOST_USER,
+            ['cristophereduardo2004@gmail.com'],
+        )
+        email.attach('reporte_nps.pdf', pdf, 'application/pdf')
         email.send(fail_silently=False)
-        messages.success(request, 'Reporte enviado a cristophereduardo2004@gmail.com')
-    except Exception as e:
-        messages.error(request, f'Error al enviar: {e}')
-
-    return redirect('Consultorias:reportes_nps')
+        return JsonResponse({
+            'success': True,
+            'message': 'Reporte enviado a cristophereduardo2004@gmail.com.',
+        })
+    except Exception:
+        logger.exception('No se pudo enviar el reporte NPS por correo')
+        return JsonResponse({
+            'success': False,
+            'error': 'No se pudo enviar el correo. Verifica las credenciales SMTP configuradas en Render.',
+        }, status=502)
 
 
 @login_required

@@ -11,7 +11,10 @@
   </div>
   <div class="d-flex gap-2">
     <button onclick="window.open('{% url 'Consultorias:reportes_nps_pdf' %}','Reporte NPS','width=900,height=750,resizable=yes,scrollbars=yes');" class="btn btn-outline-secondary">Imprimir Reporte</button>
-    <a href="{% url 'Consultorias:enviar_reporte_nps' %}" class="btn btn-outline-primary" onclick="return confirm('¿Enviar reporte a cristophereduardo2004@gmail.com?')">Enviar por correo</a>
+    <form id="form-enviar-reporte" action="{% url 'Consultorias:enviar_reporte_nps' %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary">Enviar por correo</button>
+    </form>
   </div>
 </div>
 
@@ -128,6 +131,52 @@
       pageLength: 10,
       order: [[0, 'asc']]
     });
+  });
+
+  document.getElementById('form-enviar-reporte').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const confirmation = await Swal.fire({
+      title: '¿Enviar reporte?',
+      text: 'Se enviará a cristophereduardo2004@gmail.com.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar'
+    });
+    if (!confirmation.isConfirmed) return;
+
+    Swal.fire({
+      title: 'Enviando reporte...',
+      text: 'Esto puede tardar unos segundos.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const response = await fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this),
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        signal: controller.signal
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'No se pudo enviar el reporte.');
+      }
+      await Swal.fire('Reporte enviado', data.message, 'success');
+    } catch (error) {
+      const message = error.name === 'AbortError'
+        ? 'El servidor tardó demasiado en responder. Revisa la configuración del correo en Render.'
+        : error.message;
+      await Swal.fire('Error al enviar', message, 'error');
+    } finally {
+      clearTimeout(timeout);
+    }
   });
 </script>
 {% endblock %}
