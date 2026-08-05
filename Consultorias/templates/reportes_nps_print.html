@@ -3,13 +3,19 @@
 <head>
   <meta charset="utf-8">
   <title>Reporte NPS - Mentor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+          integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; font-size: 12px; color: #333; padding: 20px; }
     h1 { font-size: 20px; color: #2d6a4f; margin-bottom: 3px; }
-    .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #2d6a4f; padding-bottom: 10px; }
+    .header { position: relative; text-align: center; min-height: 90px; margin-bottom: 15px; border-bottom: 2px solid #2d6a4f; padding: 10px 110px 10px; }
     .header p { font-size: 13px; color: #666; }
     .header small { font-size: 10px; color: #999; }
+    .qr-container { position: absolute; top: 0; right: 0; width: 90px; text-align: center; }
+    .qr-container p { margin-top: 3px; font-size: 8px; color: #666; }
     .global { background: #2d6a4f; color: #fff; padding: 12px; text-align: center; margin-bottom: 15px; border-radius: 4px; }
     .global h2 { font-size: 26px; margin: 0; }
     .global p { margin: 3px 0; font-size: 13px; }
@@ -34,6 +40,10 @@
     <h1>Mentor Consultorías</h1>
     <p>Reporte de Satisfacción NPS</p>
     <small>Generado el {% now "d/m/Y H:i" %}</small>
+    <div class="qr-container">
+      <div id="qr-reporte" aria-label="Código QR del reporte NPS"></div>
+      <p>Consultar reporte</p>
+    </div>
   </div>
 
   <div class="global">
@@ -77,6 +87,15 @@
   <button class="no-print" onclick="window.print()" style="display:block;margin:20px auto;padding:10px 24px;font-size:14px;cursor:pointer;border:1px solid #2d6a4f;background:#2d6a4f;color:#fff;border-radius:4px;">Imprimir / Guardar PDF</button>
 
   <script>
+    new QRCode(document.getElementById('qr-reporte'), {
+      text: '{{ qr_url|escapejs }}',
+      width: 80,
+      height: 80,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
     window.onload = function() { setTimeout(function() { window.print(); }, 500); };
   </script>
 </body>

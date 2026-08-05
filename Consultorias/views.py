@@ -8,6 +8,7 @@ from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 from xhtml2pdf import pisa
 import io
 import json
@@ -189,6 +190,7 @@ def reportes_nps_pdf(request):
         'global_nps': global_nps,
         'global_promedio': global_promedio,
         'total_evaluaciones': total_evaluaciones,
+        'qr_url': request.build_absolute_uri(reverse('Consultorias:reportes_nps')),
     })
 
 
