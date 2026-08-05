@@ -91,7 +91,10 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        # The bundled jQuery UI theme references icon sprites that aren't part
+        # of this repository.  The manifest backend aborts collectstatic when
+        # any referenced asset is missing, which prevents Render from building.
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
 
@@ -106,7 +109,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'cristophereduardo2004@gmail.com'
-EMAIL_HOST_PASSWORD = 'bovgzkqdkczbouxz'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
