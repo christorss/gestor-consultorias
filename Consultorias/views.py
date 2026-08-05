@@ -1,8 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout as auth_logout, login as auth_login
-from django.contrib.auth.models import User
+from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
 from django.db.models import Q
 from django.template.loader import get_template
@@ -31,38 +30,6 @@ def index(request):
         'total_objetivos': Objetivo.objects.count(),
     }
     return render(request, 'index.html', {'consultores': consultores, 'stats': stats})
-
-
-def register_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        nombre = request.POST.get('nombre')
-
-        if User.objects.filter(username=username).exists():
-            return render(request, 'registration/register.html', {'error': 'El usuario ya existe.'})
-
-        user = User.objects.create_user(username=username, email=email, password=password, first_name=nombre)
-        
-        # Crear perfil cliente por defecto
-        consultor_def = Consultor.objects.first()
-        if not consultor_def:
-            consultor_def = Consultor.objects.create(nombre='Consultor Principal', especialidad='General', email='consultor@mail.com')
-        
-        ClienteMentoreado.objects.create(
-            user=user,
-            nombre=nombre,
-            empresa='Empresa de ' + nombre,
-            sector='General',
-            email=email,
-            consultor=consultor_def
-        )
-
-        auth_login(request, user)
-        return redirect('Consultorias:dashboard')
-
-    return render(request, 'registration/register.html')
 
 
 def logout_view(request):
@@ -418,8 +385,6 @@ def consultor_crear(request):
         nombre = request.POST.get('nombre', '').strip()
         especialidad = request.POST.get('especialidad', '').strip()
         email = request.POST.get('email', '').strip()
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '')
 
         errors = {}
         if not nombre:
@@ -434,18 +399,12 @@ def consultor_crear(request):
                 'form_data': request.POST, 'errors': errors
             })
 
-        user = None
-        if username and password:
-            if User.objects.filter(username=username).exists():
-                return render(request, 'consultores/form.html', {'form_data': request.POST, 'error': 'El nombre de usuario ya existe.'})
-            user = User.objects.create_user(username=username, password=password)
         Consultor.objects.create(
             nombre=nombre,
             especialidad=especialidad,
             email=email,
             telefono=request.POST.get('telefono', ''),
             tarifa_hora=request.POST.get('tarifa_hora', 50.0),
-            user=user
         )
         return redirect('Consultorias:consultores_lista')
     return render(request, 'consultores/form.html')
@@ -461,13 +420,6 @@ def consultor_editar(request, pk):
         c.tarifa_hora = request.POST.get('tarifa_hora', 50.0)
         c.estado = request.POST.get('estado', 'ACTIVO')
         c.biografia = request.POST.get('biografia', '')
-        if not c.user:
-            username = request.POST.get('username', '').strip()
-            password = request.POST.get('password', '')
-            if username and password:
-                if User.objects.filter(username=username).exists():
-                    return render(request, 'consultores/form.html', {'consultor': c, 'error': 'El nombre de usuario ya existe.'})
-                c.user = User.objects.create_user(username=username, password=password)
         c.save()
         return redirect('Consultorias:consultores_lista')
     return render(request, 'consultores/form.html', {'consultor': c})
@@ -521,8 +473,6 @@ def cliente_crear(request):
         sector = request.POST.get('sector', '').strip()
         email = request.POST.get('email', '').strip()
         consultor_id = request.POST.get('consultor_id', '').strip()
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '')
 
         errors = {}
         if not nombre:
@@ -542,11 +492,6 @@ def cliente_crear(request):
             })
 
         cons = get_object_or_404(Consultor, id=consultor_id)
-        user = None
-        if username and password:
-            if User.objects.filter(username=username).exists():
-                return render(request, 'clientes/form.html', {'consultores': consultores, 'form_data': request.POST, 'error': 'El nombre de usuario ya existe.'})
-            user = User.objects.create_user(username=username, password=password)
         ClienteMentoreado.objects.create(
             nombre=nombre,
             empresa=empresa,
@@ -554,7 +499,6 @@ def cliente_crear(request):
             email=email,
             telefono=request.POST.get('telefono', ''),
             consultor=cons,
-            user=user
         )
         return redirect('Consultorias:clientes_lista')
     return render(request, 'clientes/form.html', {'consultores': consultores})
@@ -574,13 +518,6 @@ def cliente_editar(request, pk):
         cli.email = request.POST.get('email')
         cli.consultor = get_object_or_404(Consultor, id=request.POST.get('consultor_id'))
         cli.estado = request.POST.get('estado', 'ACTIVO')
-        if not cli.user:
-            username = request.POST.get('username', '').strip()
-            password = request.POST.get('password', '')
-            if username and password:
-                if User.objects.filter(username=username).exists():
-                    return render(request, 'clientes/form.html', {'cliente': cli, 'consultores': consultores, 'error': 'El nombre de usuario ya existe.'})
-                cli.user = User.objects.create_user(username=username, password=password)
         cli.save()
         return redirect('Consultorias:clientes_lista')
     return render(request, 'clientes/form.html', {'cliente': cli, 'consultores': consultores})

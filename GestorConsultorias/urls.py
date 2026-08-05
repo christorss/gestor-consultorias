@@ -8,7 +8,6 @@ from Consultorias import views as cons_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('register/', cons_views.register_view, name='register'),
     path('logout/', cons_views.logout_view, name='logout'),
     path('', include('Consultorias.urls')),
 ]
