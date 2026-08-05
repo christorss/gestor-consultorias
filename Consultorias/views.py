@@ -8,7 +8,7 @@ from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.views.decorators.http import require_POST
-from django.urls import reverse
+from django.utils import timezone
 from xhtml2pdf import pisa
 import io
 import json
@@ -185,12 +185,23 @@ def reportes_nps_pdf(request):
         global_nps = 0.0
         global_promedio = 0.0
 
+    fecha_generacion = timezone.localtime().strftime('%d/%m/%Y %H:%M')
+    qr_text = (
+        'Mentor Consultorías\n'
+        'Reporte de Satisfacción NPS\n'
+        f'NPS global: {global_nps}%\n'
+        f'Promedio: {global_promedio} / 10\n'
+        f'Total de evaluaciones: {total_evaluaciones}\n'
+        f'Generado: {fecha_generacion}'
+    )
+
     return render(request, 'reportes_nps_print.html', {
         'reportes_nps': reportes,
         'global_nps': global_nps,
         'global_promedio': global_promedio,
         'total_evaluaciones': total_evaluaciones,
-        'qr_url': request.build_absolute_uri(reverse('Consultorias:reportes_nps')),
+        'fecha_generacion': fecha_generacion,
+        'qr_text': qr_text,
     })
 
 

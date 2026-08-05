@@ -11,10 +11,10 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; font-size: 12px; color: #333; padding: 20px; }
     h1 { font-size: 20px; color: #2d6a4f; margin-bottom: 3px; }
-    .header { position: relative; text-align: center; min-height: 90px; margin-bottom: 15px; border-bottom: 2px solid #2d6a4f; padding: 10px 110px 10px; }
+    .header { position: relative; text-align: center; min-height: 130px; margin-bottom: 15px; border-bottom: 2px solid #2d6a4f; padding: 10px 140px; }
     .header p { font-size: 13px; color: #666; }
     .header small { font-size: 10px; color: #999; }
-    .qr-container { position: absolute; top: 0; right: 0; width: 90px; text-align: center; }
+    .qr-container { position: absolute; top: 0; right: 0; width: 125px; text-align: center; }
     .qr-container p { margin-top: 3px; font-size: 8px; color: #666; }
     .global { background: #2d6a4f; color: #fff; padding: 12px; text-align: center; margin-bottom: 15px; border-radius: 4px; }
     .global h2 { font-size: 26px; margin: 0; }
@@ -39,10 +39,10 @@
   <div class="header">
     <h1>Mentor Consultorías</h1>
     <p>Reporte de Satisfacción NPS</p>
-    <small>Generado el {% now "d/m/Y H:i" %}</small>
+    <small>Generado el {{ fecha_generacion }}</small>
     <div class="qr-container">
       <div id="qr-reporte" aria-label="Código QR del reporte NPS"></div>
-      <p>Consultar reporte</p>
+      <p>Resumen del reporte</p>
     </div>
   </div>
 
@@ -88,9 +88,9 @@
 
   <script>
     new QRCode(document.getElementById('qr-reporte'), {
-      text: '{{ qr_url|escapejs }}',
-      width: 80,
-      height: 80,
+      text: '{{ qr_text|escapejs }}',
+      width: 120,
+      height: 120,
       colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
