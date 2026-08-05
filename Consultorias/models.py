@@ -126,7 +126,6 @@ class Entregable(models.Model):
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True, default='')
     archivo = models.FileField(upload_to='entregables/', null=True, blank=True)
-    enlace_externo = models.URLField(blank=True, default='')
     estado = models.CharField(
         max_length=20,
         choices=[('PENDIENTE', 'Pendiente'), ('EN_REVISION', 'En Revisión'), ('APROBADO', 'Aprobado'), ('RECHAZADO', 'Rechazado')],
@@ -162,7 +161,6 @@ class SesionMentoria(models.Model):
         choices=[('VIRTUAL', 'Virtual'), ('PRESENCIAL', 'Presencial')],
         default='VIRTUAL'
     )
-    enlace_reunion = models.URLField(blank=True, default='')
     estado = models.CharField(
         max_length=20,
         choices=[('PROGRAMADA', 'Programada'), ('COMPLETADA', 'Completada'), ('CANCELADA', 'Cancelada')],
