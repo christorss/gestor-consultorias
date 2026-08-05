@@ -43,7 +43,7 @@
     <h2 class="fw-bold mb-0"><i class="bi bi-list-task me-2 brand-accent"></i>Plan de Trabajo</h2>
   </div>
   <div>
-    <a href="{% url 'Consultorias:objetivo_crear' %}" target="_blank" class="btn btn-success rounded-pill px-4">
+    <a href="{% url 'Consultorias:objetivo_crear' %}" class="btn btn-success rounded-pill px-4">
       <i class="bi bi-plus-lg me-1"></i>Nuevo Hito
     </a>
   </div>
@@ -124,7 +124,7 @@
         <div class="text-center py-5 text-muted">
           <i class="bi bi-inbox fs-1 d-block mb-2"></i>
           <p class="mb-2">No hay hitos registrados para este cliente.</p>
-          <a href="{% url 'Consultorias:objetivo_crear' %}" target="_blank" class="btn btn-sm btn-success rounded-pill">Agregar Primer Hito</a>
+          <a href="{% url 'Consultorias:objetivo_crear' %}" class="btn btn-sm btn-success rounded-pill">Agregar Primer Hito</a>
         </div>
       {% endfor %}
     </div>

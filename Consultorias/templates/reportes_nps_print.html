@@ -85,6 +85,9 @@
 
   <script>
     window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+    window.onafterprint = function() {
+      if (window.opener) window.close();
+    };
   </script>
 </body>
 </html>
