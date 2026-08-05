@@ -879,7 +879,32 @@ def api_sesion_guardar(request):
     if role == 'cliente':
         return JsonResponse({'success': False, 'error': 'No tienes permiso para crear sesiones.'}, status=403)
     if request.method == 'POST':
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+            fecha_inicio = timezone.datetime.fromisoformat(data.get('fecha_inicio', ''))
+            fecha_fin = timezone.datetime.fromisoformat(data.get('fecha_fin', ''))
+            if timezone.is_naive(fecha_inicio):
+                fecha_inicio = timezone.make_aware(fecha_inicio)
+            if timezone.is_naive(fecha_fin):
+                fecha_fin = timezone.make_aware(fecha_fin)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            return JsonResponse({
+                'success': False,
+                'error': 'Las fechas ingresadas no son válidas.'
+            }, status=400)
+
+        if timezone.localtime(fecha_inicio).date() < timezone.localdate():
+            return JsonResponse({
+                'success': False,
+                'error': 'No se puede agendar una sesión en una fecha anterior a hoy.'
+            }, status=400)
+
+        if fecha_fin <= fecha_inicio:
+            return JsonResponse({
+                'success': False,
+                'error': 'La fecha de fin debe ser posterior a la fecha de inicio.'
+            }, status=400)
+
         cons = get_object_or_404(Consultor, id=data.get('consultor_id'))
         cli_id = data.get('cliente_id')
         cli = get_object_or_404(ClienteMentoreado, id=cli_id) if cli_id else None
@@ -889,8 +914,9 @@ def api_sesion_guardar(request):
             tipo=data.get('tipo', 'INDIVIDUAL'),
             consultor=cons,
             cliente=cli,
-            fecha_inicio=data.get('fecha_inicio'),
-            fecha_fin=data.get('fecha_fin')
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            modalidad=data.get('modalidad', 'VIRTUAL')
         )
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})

@@ -149,9 +149,21 @@ let calendar = null;
 let modalSesionInstance = null;
 const esCliente = '{{ user_role }}' === 'cliente';
 
+function fechaLocalInput(fecha) {
+  const pad = valor => String(valor).padStart(2, '0');
+  return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}`;
+}
+
+function inicioDelDia(fecha = new Date()) {
+  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   modalSesionInstance = new bootstrap.Modal(document.getElementById('modalSesion'));
   const calendarEl = document.getElementById('calendar');
+  const minimoHoy = fechaLocalInput(inicioDelDia());
+  document.getElementById('sesion-inicio').min = minimoHoy;
+  document.getElementById('sesion-fin').min = minimoHoy;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -181,6 +193,18 @@ document.addEventListener('DOMContentLoaded', function() {
     selectable: !esCliente,
     select: function(info) {
       if (esCliente) return;
+
+      if (inicioDelDia(info.start) < inicioDelDia()) {
+        calendar.unselect();
+        Swal.fire({
+          icon: 'warning',
+          title: 'Fecha no permitida',
+          text: 'No puedes agendar una sesión en una fecha anterior a hoy.',
+          confirmButtonColor: '#198754'
+        });
+        return;
+      }
+
       document.getElementById('formSesion').reset();
       document.getElementById('sesion-id').value = '';
       
@@ -228,11 +252,11 @@ function abrirModalNuevaSesion() {
   document.getElementById('sesion-id').value = '';
   
   const now = new Date();
-  const nowIso = now.toISOString().substring(0,16);
+  const nowIso = fechaLocalInput(now);
   document.getElementById('sesion-inicio').value = nowIso;
   
   now.setHours(now.getHours() + 1);
-  document.getElementById('sesion-fin').value = now.toISOString().substring(0,16);
+  document.getElementById('sesion-fin').value = fechaLocalInput(now);
 
   modalSesionInstance.show();
 }
@@ -260,7 +284,20 @@ function guardarSesion() {
   };
 
   if (!payload.titulo || !payload.consultor_id || !payload.fecha_inicio || !payload.fecha_fin) {
-    alert("Por favor complete los campos requeridos.");
+    Swal.fire('Campos incompletos', 'Por favor complete los campos requeridos.', 'warning');
+    return;
+  }
+
+  const fechaInicio = new Date(payload.fecha_inicio);
+  const fechaFin = new Date(payload.fecha_fin);
+
+  if (inicioDelDia(fechaInicio) < inicioDelDia()) {
+    Swal.fire('Fecha no permitida', 'No puedes agendar una sesión en una fecha anterior a hoy.', 'warning');
+    return;
+  }
+
+  if (fechaFin <= fechaInicio) {
+    Swal.fire('Horario no válido', 'La fecha de fin debe ser posterior a la fecha de inicio.', 'warning');
     return;
   }
 
@@ -277,11 +314,12 @@ function guardarSesion() {
     if (data.success) {
       modalSesionInstance.hide();
       calendar.refetchEvents();
+      Swal.fire('Sesión guardada', 'La sesión se agendó correctamente.', 'success');
     } else {
-      alert("Error al guardar: " + data.error);
+      Swal.fire('No se pudo guardar', data.error || 'Ocurrió un error al guardar la sesión.', 'error');
     }
   })
-  .catch(err => alert("Error al comunicarse con el servidor."));
+  .catch(() => Swal.fire('Error de conexión', 'No se pudo comunicar con el servidor.', 'error'));
 }
 </script>
 {% endblock %}
