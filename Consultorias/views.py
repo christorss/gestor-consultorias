@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
@@ -20,6 +20,23 @@ from .models import Consultor, ClienteMentoreado, Objetivo, Entregable, SesionMe
 
 
 logger = logging.getLogger(__name__)
+
+
+def service_worker(request):
+    """Sirve el worker desde la raíz para que pueda controlar toda la app."""
+    response = FileResponse(
+        open(settings.BASE_DIR / 'static' / 'pwa' / 'service-worker.js', 'rb'),
+        content_type='application/javascript',
+    )
+    response['Service-Worker-Allowed'] = '/'
+    response['Cache-Control'] = 'no-cache'
+    return response
+
+
+def offline(request):
+    response = render(request, 'offline.html')
+    response['Cache-Control'] = 'public, max-age=300'
+    return response
 
 
 # --- INICIO Y AUTENTICACION ---

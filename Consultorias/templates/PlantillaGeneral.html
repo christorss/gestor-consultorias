@@ -7,6 +7,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>{% block title %}Gestor de Consultorías y Mentores{% endblock %} - Mentor</title>
   <meta name="description" content="Gestor de Consultorías de Negocios y Mentores">
+  {% include 'pwa/head.html' %}
 
   <!-- Favicons -->
   <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
@@ -89,6 +90,7 @@
 </head>
 
 <body class="index-page">
+  {% include 'pwa/install_button.html' %}
 
   <!-- Header Navigation -->
   <header id="header" class="header d-flex align-items-center sticky-top">
@@ -239,5 +241,6 @@
   </script>
 
   {% block extra_js %}{% endblock %}
+  {% include 'pwa/scripts.html' %}
 </body>
 </html>

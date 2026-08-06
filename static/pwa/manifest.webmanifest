@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "Mentor - Gestor de Consultorías",
+  "short_name": "Mentor",
+  "description": "Gestión de consultorías, mentorías, sesiones y objetivos.",
+  "lang": "es-EC",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#5fcf80",
+  "icons": [
+    {"src": "/static/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/static/pwa/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 from Consultorias import views as cons_views
 
 urlpatterns = [
+    path('service-worker.js', cons_views.service_worker, name='service_worker'),
+    path('sin-conexion/', cons_views.offline, name='offline'),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', cons_views.logout_view, name='logout'),

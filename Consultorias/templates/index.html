@@ -8,6 +8,7 @@
   <title>Inicio - Gestor de Consultorías de Negocios y Mentores</title>
   <meta name="description" content="Gestor de Consultorías de Negocios y Mentores - Plataforma integral de mentoría empresarial">
   <meta name="keywords" content="consultoría, mentoría, negocios, emprendimiento, gestión">
+  {% include 'pwa/head.html' %}
 
   <!-- Favicons -->
   <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
@@ -30,6 +31,7 @@
 </head>
 
 <body class="index-page">
+  {% include 'pwa/install_button.html' %}
 
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
@@ -434,6 +436,9 @@
 
   <!-- Main JS File -->
   <script src="{% static 'assets/js/main.js' %}"></script>
+  <!-- SweetAlert2 para avisos de instalación PWA -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  {% include 'pwa/scripts.html' %}
 
 </body>
 </html>

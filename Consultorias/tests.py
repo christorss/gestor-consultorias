@@ -47,4 +47,17 @@ class EnviarReporteNpsTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 405)
 
-# Create your tests here.
+
+class PwaTests(SimpleTestCase):
+    def test_service_worker_is_served_from_root(self):
+        response = self.client.get('/service-worker.js')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/javascript')
+        self.assertEqual(response['Service-Worker-Allowed'], '/')
+
+    def test_offline_page_is_available(self):
+        response = self.client.get('/sin-conexion/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Estás sin conexión')
