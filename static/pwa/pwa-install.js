@@ -5,8 +5,10 @@
   let installPrompt = null;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isDesktop = !/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isDesktop = !isIOS && !isAndroid;
   const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+  const isFirefox = /firefox/i.test(navigator.userAgent);
 
   const showMessage = options => {
     if (window.Swal) return window.Swal.fire(options);
@@ -65,12 +67,14 @@
       });
     } else if (isDesktop) {
       showMessage({
-        icon: 'info',
-        title: 'Instalar en esta computadora',
-        html: isMac
-          ? 'Usa <strong>Chrome o Edge</strong>, abre el menú del navegador y selecciona <strong>Instalar Mentor</strong>. En Safari compatible también puedes usar <strong>Archivo → Añadir al Dock</strong>.'
-          : 'Usa <strong>Google Chrome o Microsoft Edge</strong>, abre el menú <strong>⋮</strong> y selecciona <strong>Instalar Mentor</strong> o <strong>Aplicaciones → Instalar este sitio como una aplicación</strong>.',
-        footer: 'La aplicación se abrirá en su propia ventana y aparecerá en el menú de aplicaciones.',
+        icon: isFirefox ? 'warning' : 'info',
+        title: isFirefox ? 'Firefox no permite instalarla en Fedora' : 'Instalar en esta computadora',
+        html: isFirefox
+          ? 'Abre esta página en <strong>Google Chrome, Chromium o Microsoft Edge</strong> y pulsa nuevamente <strong>Descargar / instalar</strong>.'
+          : (isMac
+            ? 'Usa <strong>Chrome o Edge</strong>, abre el menú del navegador y selecciona <strong>Instalar Mentor</strong>. En Safari compatible también puedes usar <strong>Archivo → Añadir al Dock</strong>.'
+            : 'En Chrome o Chromium abre el menú <strong>⋮</strong>, entra en <strong>Transmitir, guardar y compartir</strong> y selecciona <strong>Instalar página como aplicación</strong>.'),
+        footer: isFirefox ? 'En Fedora puedes instalar Chromium con: sudo dnf install chromium' : 'Mentor aparecerá en el menú de aplicaciones de tu computadora.',
         confirmButtonText: 'Entendido',
         confirmButtonColor: '#5fcf80'
       });

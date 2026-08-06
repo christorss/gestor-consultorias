@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mentor-pwa-v3';
+const CACHE_VERSION = 'mentor-pwa-v4';
 const OFFLINE_URL = '/sin-conexion/';
 const APP_SHELL = [
   OFFLINE_URL,
@@ -25,6 +25,15 @@ self.addEventListener('fetch', event => {
 
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
+    return;
+  }
+
+  // Los archivos que controlan la instalación deben actualizarse de inmediato.
+  if (url.pathname.startsWith('/static/pwa/')) {
+    event.respondWith(fetch(request).then(response => {
+      if (response.ok) caches.open(CACHE_VERSION).then(cache => cache.put(request, response.clone()));
+      return response;
+    }).catch(() => caches.match(request)));
     return;
   }
 
