@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mentor-pwa-v2';
+const CACHE_VERSION = 'mentor-pwa-v3';
 const OFFLINE_URL = '/sin-conexion/';
 const APP_SHELL = [
   OFFLINE_URL,

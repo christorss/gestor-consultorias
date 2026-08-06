@@ -5,6 +5,8 @@
   let installPrompt = null;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isDesktop = !/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+  const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
   const showMessage = options => {
     if (window.Swal) return window.Swal.fire(options);
@@ -58,6 +60,17 @@
         icon: 'info',
         title: 'Instalar en iPhone o iPad',
         html: 'Toca el botón <strong>Compartir</strong> <span aria-hidden="true">□↑</span> y selecciona <strong>Agregar a pantalla de inicio</strong>.',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#5fcf80'
+      });
+    } else if (isDesktop) {
+      showMessage({
+        icon: 'info',
+        title: 'Instalar en esta computadora',
+        html: isMac
+          ? 'Usa <strong>Chrome o Edge</strong>, abre el menú del navegador y selecciona <strong>Instalar Mentor</strong>. En Safari compatible también puedes usar <strong>Archivo → Añadir al Dock</strong>.'
+          : 'Usa <strong>Google Chrome o Microsoft Edge</strong>, abre el menú <strong>⋮</strong> y selecciona <strong>Instalar Mentor</strong> o <strong>Aplicaciones → Instalar este sitio como una aplicación</strong>.',
+        footer: 'La aplicación se abrirá en su propia ventana y aparecerá en el menú de aplicaciones.',
         confirmButtonText: 'Entendido',
         confirmButtonColor: '#5fcf80'
       });
