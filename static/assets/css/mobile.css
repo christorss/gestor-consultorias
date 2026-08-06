@@ -1,0 +1,288 @@
+/* Ajustes globales para teléfonos y tabletas pequeñas. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .header {
+    min-height: 64px;
+    padding: 8px 0;
+  }
+
+  .header .container-xl {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+
+  .header .logo {
+    margin-right: auto !important;
+  }
+
+  .header .logo h1,
+  .header .sitename {
+    font-size: 20px;
+    white-space: nowrap;
+  }
+
+  .header .navmenu {
+    order: 3;
+  }
+
+  .header .mobile-nav-toggle {
+    margin: 0 2px;
+    font-size: 27px;
+  }
+
+  .header .container-xl > .d-flex.align-items-center.ms-3 {
+    margin-left: 0 !important;
+  }
+
+  .header .container-xl > .d-flex.align-items-center.ms-3 > span {
+    display: none;
+  }
+
+  .header .btn-get-started {
+    padding: 7px 13px;
+    font-size: 12px;
+  }
+
+  .navmenu ul {
+    inset: 66px 12px 16px 12px;
+    max-height: calc(100vh - 82px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .main {
+    margin-top: 0 !important;
+  }
+
+  .main > .container-xl,
+  .main > .container-fluid,
+  section > .container {
+    padding-inline: 14px;
+  }
+
+  .section {
+    padding: 38px 0;
+  }
+
+  .section-title {
+    padding-bottom: 28px;
+  }
+
+  .section-title p,
+  .main h1 {
+    font-size: clamp(1.55rem, 7vw, 2rem);
+    line-height: 1.2;
+  }
+
+  .main h2 {
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+  }
+
+  .hero {
+    min-height: 72vh;
+    padding: 72px 0 48px;
+  }
+
+  .hero h2 {
+    font-size: clamp(2rem, 9vw, 2.65rem);
+    line-height: 1.12;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  /* Encabezados de módulos: título y acciones pasan a dos filas. */
+  .main .container-xl > .d-flex.justify-content-between.align-items-center,
+  .main .container-xl > form + .d-flex.justify-content-between.align-items-center,
+  #step-header {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .main .container-xl > .d-flex.justify-content-between.align-items-center > .d-flex,
+  #step-header > .d-flex {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .main .container-xl > .d-flex.justify-content-between.align-items-center > a,
+  .main .container-xl > .d-flex.justify-content-between.align-items-center > button,
+  .main .container-xl > .d-flex.justify-content-between.align-items-center > .btn,
+  #step-header > a,
+  #step-header > button {
+    width: 100%;
+  }
+
+  .card,
+  .card-custom {
+    border-radius: 10px;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* Todos los campos conservan un tamaño cómodo y evitan zoom automático en iOS. */
+  input,
+  select,
+  textarea,
+  .form-control,
+  .form-select {
+    max-width: 100%;
+    font-size: 16px !important;
+  }
+
+  textarea.form-control {
+    min-height: 120px;
+  }
+
+  .form-actions,
+  .card-body > .d-flex.justify-content-end {
+    flex-direction: column-reverse;
+  }
+
+  .card-body > .d-flex.justify-content-end .btn {
+    width: 100%;
+  }
+
+  /* Las tablas pueden desplazarse horizontalmente sin mover toda la página. */
+  .table-responsive {
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    width: calc(100% + 2rem);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    font-size: .86rem;
+  }
+
+  .table th,
+  .table td {
+    min-width: 105px;
+    padding: .7rem .55rem;
+    vertical-align: middle;
+  }
+
+  .table th:first-child,
+  .table td:first-child {
+    min-width: 135px;
+  }
+
+  .table .btn {
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .dataTables_wrapper .row {
+    gap: 10px;
+  }
+
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_paginate {
+    text-align: left !important;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    display: block;
+    margin: 6px 0 0 !important;
+    width: 100% !important;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  /* Calendario y modales utilizables en orientación vertical. */
+  .fc .fc-header-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fc .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .fc .fc-button {
+    padding: .45rem .6rem;
+    font-size: .78rem;
+  }
+
+  .modal-dialog {
+    margin: .65rem;
+  }
+
+  .modal-content {
+    max-height: calc(100vh - 1.3rem);
+    overflow-y: auto;
+  }
+
+  .sortable-card {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sortable-card > .d-flex:last-child {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .alert.d-flex {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+  }
+
+  .swal2-popup {
+    width: calc(100% - 1.5rem) !important;
+    padding: 1.25rem !important;
+  }
+
+  .footer {
+    text-align: center;
+  }
+}
+
+@media (max-width: 374.98px) {
+  .header .logo h1,
+  .header .sitename {
+    font-size: 17px;
+  }
+
+  .header .btn-get-started {
+    padding: 6px 10px;
+  }
+
+  .pwa-install-button {
+    max-width: calc(100vw - 5rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

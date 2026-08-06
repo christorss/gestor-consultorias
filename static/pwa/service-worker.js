@@ -1,9 +1,10 @@
-const CACHE_VERSION = 'mentor-pwa-v1';
+const CACHE_VERSION = 'mentor-pwa-v2';
 const OFFLINE_URL = '/sin-conexion/';
 const APP_SHELL = [
   OFFLINE_URL,
   '/static/pwa/manifest.webmanifest',
   '/static/pwa/pwa.css',
+  '/static/assets/css/mobile.css',
   '/static/pwa/pwa-install.js',
   '/static/pwa/icons/icon-192.png',
   '/static/pwa/icons/icon-512.png'
